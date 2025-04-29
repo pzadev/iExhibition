@@ -18,13 +18,11 @@ function App() {
   };
 
   type metArtwork = {
-    objectID: number;
-    primaryImage?: string;
+    accessionYear: number;
+    artistDisplayName: string;
     title: string;
-    artistDisplayName?: string;
-    objectDate: string;
-    culture?: string;
-    id: number;
+    primaryImage: string;
+
   };
 
   const [chicagoArt, setChicagoArt] = useState<chicagoArtwork[]>([]);
@@ -50,8 +48,10 @@ function App() {
       );
       const artworks = await Promise.all(objectPromises);
 
-      const filtered = artworks.filter((art: any) => art.primaryImage);
-      setMetArt(filtered);
+   
+
+      console.log(artworks)
+      setMetArt(artworks);
     };
 
     fetchMetData();
@@ -60,7 +60,7 @@ function App() {
   return (
     <>
       <div className="flex-col">
-        <h1 className="font-medium text-center text-2xl mt-4">Museum</h1>
+        <h1 className="font-medium text-center text-2xl mt-4">Chicago Art</h1>
       </div>
 
       {chicagoArt.length > 0 ? (
@@ -85,6 +85,34 @@ function App() {
               <p className="text-sm text-gray-700">
                 {artwork.place_of_origin || "Unknown Origin"} -{" "}
                 {artwork.date_end}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-gray-600 mt-5">Loading artworks...</p>
+      )}
+
+<h1 className="font-medium text-center text-2xl mt-10">Met Art Museum</h1>
+
+{metArt.length > 0 ? (
+        <div className="flex flex-wrap justify-center gap-10 mt-3">
+          {metArt.map((artwork, id) => (
+            <div
+              key={id}
+              className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
+            >
+              {artwork && (
+                <img
+                  src={artwork.primaryImage}
+                  alt={artwork.title}
+                  className="mb-4 w-full max-w-xs rounded"
+                />
+              )}
+              <h2 className="text-lg font-semibold">{artwork.title}</h2>
+              {/* <p className="text-md">{artwork.description}</p> */}
+              <p className="text-md text-black">
+                {artwork.artistDisplayName || "Unknown Artist"}
               </p>
             </div>
           ))}

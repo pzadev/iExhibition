@@ -1,126 +1,22 @@
 import "./App.css";
-import {
-  fetchChicagoArtwork,
-  fetchMetObjectById,
-  fetchMetObjectIDs,
-} from "../api";
-import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Bar from "./Bar";
+import Home from "./Home";
+import Chicago from "./Chicago";
+import Met from "./Met";
 
 function App() {
-  type chicagoArtwork = {
-    id: number;
-    title: string;
-    image_id: string;
-    date_end: number;
-    description?: string;
-    artist_title?: string;
-    place_of_origin?: string;
-  };
-
-  type metArtwork = {
-    accessionYear: number;
-    artistDisplayName: string;
-    title: string;
-    primaryImage: string;
-
-  };
-
-  const [chicagoArt, setChicagoArt] = useState<chicagoArtwork[]>([]);
-  const [metArt, setMetArt] = useState<metArtwork[]>([]);
-
-  useEffect(() => {
-    const fetchArtData = async () => {
-      const chicagoData = await fetchChicagoArtwork();
-
-      setChicagoArt(chicagoData.data);
-    };
-
-    fetchArtData();
-  }, []);
-
-  useEffect(() => {
-    const fetchMetData = async () => {
-      const idsData = await fetchMetObjectIDs();
-      const randomIDs = idsData.objectIDs.slice(0, 10);
-
-      const objectPromises = randomIDs.map((id: number) =>
-        fetchMetObjectById(id)
-      );
-      const artworks = await Promise.all(objectPromises);
-
-   
-
-      console.log(artworks)
-      setMetArt(artworks);
-    };
-
-    fetchMetData();
-  }, []);
-
   return (
-    <>
-      <div className="flex-col">
-        <h1 className="font-medium text-center text-2xl mt-4">Chicago Art</h1>
+    <div className="flex flex-col min-h-screen min-w-screen">
+      <Bar />
+      <div className="flex-grow bg-white pt-[5px] p-2">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/chicago" element={<Chicago />} />
+          <Route path="/met" element={<Met />} />
+        </Routes>
       </div>
-
-      {chicagoArt.length > 0 ? (
-        <div className="flex flex-wrap justify-center gap-10 mt-3">
-          {chicagoArt.map((artwork, id) => (
-            <div
-              key={id}
-              className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
-            >
-              {artwork && (
-                <img
-                  src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
-                  alt={artwork.title}
-                  className="mb-4 w-full max-w-xs rounded"
-                />
-              )}
-              <h2 className="text-lg font-semibold">{artwork.title}</h2>
-              {/* <p className="text-md">{artwork.description}</p> */}
-              <p className="text-md text-black">
-                {artwork.artist_title || "Unknown Artist"}
-              </p>
-              <p className="text-sm text-gray-700">
-                {artwork.place_of_origin || "Unknown Origin"} -{" "}
-                {artwork.date_end}
-              </p>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-center text-gray-600 mt-5">Loading artworks...</p>
-      )}
-
-<h1 className="font-medium text-center text-2xl mt-10">Met Art Museum</h1>
-
-{metArt.length > 0 ? (
-        <div className="flex flex-wrap justify-center gap-10 mt-3">
-          {metArt.map((artwork, id) => (
-            <div
-              key={id}
-              className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
-            >
-              {artwork && (
-                <img
-                  src={artwork.primaryImage}
-                  alt={artwork.title}
-                  className="mb-4 w-full max-w-xs rounded"
-                />
-              )}
-              <h2 className="text-lg font-semibold">{artwork.title}</h2>
-              {/* <p className="text-md">{artwork.description}</p> */}
-              <p className="text-md text-black">
-                {artwork.artistDisplayName || "Unknown Artist"}
-              </p>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-center text-gray-600 mt-5">Loading artworks...</p>
-      )}
-    </>
+    </div>
   );
 }
 

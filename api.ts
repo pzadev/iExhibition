@@ -6,6 +6,7 @@ const chicagoAPI = "https://api.artic.edu/api/v1/artworks";
 export const fetchChicagoArtwork = async () => {
   try {
     const response = await axios.get(chicagoAPI);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.log(error);

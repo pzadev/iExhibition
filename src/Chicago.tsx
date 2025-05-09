@@ -48,7 +48,6 @@ function Chicago() {
                 />
               )}
               <h2 className="text-lg font-semibold">{artwork.title}</h2>
-              {/* <p className="text-md">{artwork.description}</p> */}
               <p className="text-md text-black">
                 {artwork.artist_title || "Unknown Artist"}
               </p>

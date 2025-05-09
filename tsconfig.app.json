@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "api.ts", "src/ThemeContext.tsx"]
+  "include": ["src", "api.ts", "src/ThemeContext.tsx", "tailwind.config.js", "postcss.config.js"]
 }

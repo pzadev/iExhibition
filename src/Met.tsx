@@ -8,6 +8,7 @@ function Met() {
     artistDisplayName: string;
     title: string;
     primaryImage: string;
+    artistNationality: string;
   };
   const [metArt, setMetArt] = useState<metArtwork[]>([]);
 
@@ -50,10 +51,12 @@ function Met() {
                   className="mb-4 w-full max-w-xs rounded"
                 />
               )}
-              <h2 className="text-lg font-semibold">{artwork.title}</h2>
+              <h2 className="text-lg font-bold">{artwork.title} </h2>
+              <p className="text-md font-semibold">
+                {artwork.artistNationality} - {artwork.accessionYear}
+              </p>
               <p className="text-md text-black">
-                {artwork.artistDisplayName || "Unknown Artist"} -{" "}
-                {artwork.accessionYear}
+                {artwork.artistDisplayName || "Unknown Artist"}
               </p>
             </div>
           ))}

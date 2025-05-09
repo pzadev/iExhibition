@@ -15,10 +15,10 @@ function Home() {
                   alt="Art Institute of Chicago"
                   className="mb-4 h-[300px] w-[400px]  rounded"
                 />
-                <h2 className="text-lg font-semibold">
+                <h2 className="text-lg font-bold">
                   Art Institute of Chicago
                 </h2>
-                <p className="text-md text-black">Various Artists</p>
+                <p className="text-md text-black font-semibold ">Chicago, IN </p>
               </div>
             </span>
             <span
@@ -31,10 +31,10 @@ function Home() {
                   alt="The Metropolitan Museum of Art"
                   className="mb-4 h-[300px] w-[400px]  rounded"
                 />
-                <h2 className="text-lg font-semibold">
+                <h2 className="text-lg font-bold">
                   The Metropolitan Museum of Art
                 </h2>
-                <p className="text-md text-black">Various Artists</p>
+                <p className="text-md text-black font-semibold">New York, NY</p>
               </div>
             </span>
           </div>

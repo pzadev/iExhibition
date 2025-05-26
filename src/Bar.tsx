@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { ThemeContext } from "./ThemeContext";
 import {
   HomeIcon,
   UserIcon,
@@ -9,13 +8,6 @@ import {
 
 function Bar() {
   const currentPath = window.location.pathname;
-  const { theme, toggleTheme } = useContext(ThemeContext);
-
-  function changeTheme() {
-    console.log("Theme changed");
-    toggleTheme();
-    console.log("New theme:", theme);
-  }
 
   return (
     <header className="w-full bg-white dark:bg-gray-900 border-b-2 border-gray-400 dark:border-gray-700 shadow px-4 py-5 flex items-center justify-between">
@@ -43,18 +35,6 @@ function Bar() {
             }`}
           />
         </span>
-
-        {theme === "light" ? (
-          <MoonIcon
-            onClick={changeTheme}
-            className="h-8 w-8 text-blue-500 hover:text-blue-600 cursor-pointer"
-          />
-        ) : (
-          <SunIcon
-            onClick={changeTheme}
-            className="h-8 w-8 text-yellow-400 hover:text-yellow-300 cursor-pointer"
-          />
-        )}
       </div>
     </header>
   );

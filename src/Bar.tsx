@@ -1,9 +1,7 @@
-import { useContext } from "react";
 import {
   HomeIcon,
   UserIcon,
   MoonIcon,
-  SunIcon,
 } from "@heroicons/react/24/outline";
 
 function Bar() {
@@ -20,6 +18,16 @@ function Bar() {
           <HomeIcon
             className={`h-8 w-8 cursor-pointer ${
               currentPath === "/"
+                ? "text-green-600"
+                : "text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+            }`}
+          />
+        </span>
+
+        <span onClick={() => (window.location.href = "/exhibition")}>
+          <MoonIcon
+            className={`h-8 w-8 cursor-pointer ${
+              currentPath === "/exhibition"
                 ? "text-green-600"
                 : "text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
             }`}

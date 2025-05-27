@@ -4,6 +4,7 @@ import Bar from "./Bar";
 import Home from "./Home";
 import Chicago from "./Chicago";
 import Met from "./Met";
+import Exhibition from "./Exhibition";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/chicago" element={<Chicago />} />
           <Route path="/met" element={<Met />} />
+          <Route path="/exhibition" element={<Exhibition />} />
         </Routes>
       </div>
     </div>

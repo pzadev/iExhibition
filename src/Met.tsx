@@ -11,13 +11,45 @@ function Met() {
     artistNationality: string;
   };
 
+  type Exhibition = {
+    id: number;
+    name: string;
+    artworks: MetArtwork[];
+  };
+
   const [metArt, setMetArt] = useState<MetArtwork[]>([]);
   const [filteredArt, setFilteredArt] = useState<MetArtwork[]>([]);
   const [selectedNationality, setSelectedNationality] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("Newest");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage] = useState<number>(6);
-  const [savedArtworks, setSavedArtworks] = useState<MetArtwork[]>([]);
+  const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
+  const [selectedExhibition, setSelectedExhibition] = useState<number | null>(
+    null
+  );
+
+  useEffect(() => {
+    const storedExhibitions = localStorage.getItem("met_exhibitions");
+    if (storedExhibitions) {
+      const parsed = JSON.parse(storedExhibitions);
+      setExhibitions(parsed);
+      setSelectedExhibition(parsed[0]?.id || null);
+    } else {
+      const customExhibition: Exhibition = {
+        id: Date.now(),
+        name: "Your Custom Exhibition",
+        artworks: [],
+      };
+      setExhibitions([customExhibition]);
+      setSelectedExhibition(customExhibition.id);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (exhibitions.length > 0) {
+      localStorage.setItem("met_exhibitions", JSON.stringify(exhibitions));
+    }
+  }, [exhibitions]);
 
   useEffect(() => {
     const fetchMetData = async () => {
@@ -67,13 +99,56 @@ function Met() {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const saveArtwork = (artwork: MetArtwork) => {
-    if (!savedArtworks.some((item) => item.title === artwork.title)) {
-      setSavedArtworks([...savedArtworks, artwork]);
-    }
+    if (selectedExhibition === null) return;
+
+    const updatedExhibitions = exhibitions.map((exhibition) => {
+      if (exhibition.id === selectedExhibition) {
+        const alreadySaved = exhibition.artworks.some(
+          (item) => item.title === artwork.title
+        );
+        if (!alreadySaved) {
+          const enhancedArtwork = {
+            ...artwork,
+            source: "met" as const,
+          };
+          return {
+            ...exhibition,
+            artworks: [...exhibition.artworks, enhancedArtwork],
+          };
+        }
+      }
+      return exhibition;
+    });
+
+    setExhibitions(updatedExhibitions);
   };
 
   const removeArtwork = (artwork: MetArtwork) => {
-    setSavedArtworks(savedArtworks.filter((item) => item.title !== artwork.title));
+    if (selectedExhibition === null) return;
+
+    const updatedExhibitions = exhibitions.map((exhibition) => {
+      if (exhibition.id === selectedExhibition) {
+        return {
+          ...exhibition,
+          artworks: exhibition.artworks.filter(
+            (item) => item.title !== artwork.title
+          ),
+        };
+      }
+      return exhibition;
+    });
+    setExhibitions(updatedExhibitions);
+  };
+
+  const isArtworkSaved = (artwork: MetArtwork) => {
+    if (selectedExhibition === null) return false;
+
+    const exhibition = exhibitions.find(
+      (exhibition) => exhibition.id === selectedExhibition
+    );
+    return (
+      exhibition?.artworks.some((item) => item.title === artwork.title) || false
+    );
   };
 
   return (
@@ -126,12 +201,21 @@ function Met() {
               <p className="text-md text-black">
                 {artwork.artistDisplayName || "Unknown Artist"}
               </p>
-              <button
-                onClick={() => saveArtwork(artwork)}
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-              >
-                Save to Exhibition
-              </button>
+              {isArtworkSaved(artwork) ? (
+                <button
+                  onClick={() => removeArtwork(artwork)}
+                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+                >
+                  Remove from Exhibition
+                </button>
+              ) : (
+                <button
+                  onClick={() => saveArtwork(artwork)}
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Save to Exhibition
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -161,35 +245,63 @@ function Met() {
 
       <div className="mt-10 w-full">
         <h2 className="text-2xl font-bold mb-4">Your Exhibitions</h2>
-        <div className="flex flex-wrap justify-center gap-10 mt-3">
-          {savedArtworks.map((artwork, index) => (
-            <div
-              key={index}
-              className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
+        <div className="flex flex-wrap gap-4 mb-4">
+          {exhibitions.map((exhibition) => (
+            <button
+              key={exhibition.id}
+              onClick={() => setSelectedExhibition(exhibition.id)}
+              className={`px-4 py-2 rounded ${
+                selectedExhibition === exhibition.id
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
             >
-              {artwork && (
-                <img
-                  src={artwork.primaryImage}
-                  alt={artwork.title}
-                  className="mb-4 w-full max-w-xs rounded"
-                />
-              )}
-              <h2 className="text-lg font-bold">{artwork.title} </h2>
-              <p className="text-md font-semibold">
-                {artwork.artistNationality} - {artwork.accessionYear}
-              </p>
-              <p className="text-md text-black">
-                {artwork.artistDisplayName || "Unknown Artist"}
-              </p>
-              <button
-                onClick={() => removeArtwork(artwork)}
-                className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
-              >
-                Remove from your Exhibition
-              </button>
-            </div>
+              {exhibition.name}
+            </button>
           ))}
         </div>
+        {selectedExhibition && (
+          <div>
+            <h3 className="text-xl font-bold mb-4">
+              {
+                exhibitions.find(
+                  (exhibition) => exhibition.id === selectedExhibition
+                )?.name
+              }
+            </h3>
+            <div className="flex flex-wrap justify-center gap-10 mt-3">
+              {exhibitions
+                .find((exhibition) => exhibition.id === selectedExhibition)
+                ?.artworks.map((artwork, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
+                  >
+                    {artwork && (
+                      <img
+                        src={artwork.primaryImage}
+                        alt={artwork.title}
+                        className="mb-4 w-full max-w-xs rounded"
+                      />
+                    )}
+                    <h2 className="text-lg font-bold">{artwork.title} </h2>
+                    <p className="text-md font-semibold">
+                      {artwork.artistNationality} - {artwork.accessionYear}
+                    </p>
+                    <p className="text-md text-black">
+                      {artwork.artistDisplayName || "Unknown Artist"}
+                    </p>
+                    <button
+                      onClick={() => removeArtwork(artwork)}
+                      className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+                    >
+                      Remove from your Exhibition
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchChicagoArtwork } from "../api.ts";
 
 interface Artwork {
@@ -23,7 +23,9 @@ const Chicago: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage] = useState<number>(6);
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
-  const [selectedExhibition, setSelectedExhibition] = useState<number | null>(null);
+  const [selectedExhibition, setSelectedExhibition] = useState<number | null>(
+    null
+  );
   const [newExhibitionName, setNewExhibitionName] = useState<string>("");
 
   useEffect(() => {
@@ -37,14 +39,29 @@ const Chicago: React.FC = () => {
     }
 
     fetchData();
+
+    const savedExhibitions = localStorage.getItem("exhibitions");
+    if (savedExhibitions) {
+      setExhibitions(JSON.parse(savedExhibitions));
+    } else {
+      const customExhibition: Exhibition = {
+        id: Date.now(),
+        name: "Your Custom Exhibition",
+        artworks: [],
+      };
+      setExhibitions([customExhibition]);
+      setSelectedExhibition(customExhibition.id);
+    }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("exhibitions", JSON.stringify(exhibitions));
+  }, [exhibitions]);
 
   const artistOptions = [
     "All",
     ...Array.from(
-      new Set(
-        chicagoArt.map((art) => art.artist_title || "Unknown Artist")
-      )
+      new Set(chicagoArt.map((art) => art.artist_title || "Unknown Artist"))
     ),
   ];
 
@@ -60,7 +77,10 @@ const Chicago: React.FC = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredAndSortedArt.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredAndSortedArt.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredAndSortedArt.length / itemsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
@@ -98,12 +118,22 @@ const Chicago: React.FC = () => {
       if (exhibition.id === selectedExhibition) {
         return {
           ...exhibition,
-          artworks: exhibition.artworks.filter((item) => item.id !== artwork.id),
+          artworks: exhibition.artworks.filter(
+            (item) => item.id !== artwork.id
+          ),
         };
       }
       return exhibition;
     });
     setExhibitions(updatedExhibitions);
+  };
+
+  const isArtworkInExhibition = (artwork: Artwork) => {
+    if (selectedExhibition === null) return false;
+    const exhibition = exhibitions.find(
+      (exhibition) => exhibition.id === selectedExhibition
+    );
+    return exhibition?.artworks.some((item) => item.id === artwork.id) || false;
   };
 
   return (
@@ -158,12 +188,21 @@ const Chicago: React.FC = () => {
             </p>
             <p className="text-gray-500 text-sm">{artwork.place_of_origin}</p>
             <p className="text-gray-500 text-sm">Year: {artwork.date_end}</p>
-            <button
-              onClick={() => addArtworkToExhibition(artwork)}
-              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              Add to Exhibition
-            </button>
+            {/* {isArtworkInExhibition(artwork) ? (
+              <button
+                onClick={() => removeArtworkFromExhibition(artwork)}
+                className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+              >
+                Remove from Exhibition
+              </button>
+            ) : (
+              <button
+                onClick={() => addArtworkToExhibition(artwork)}
+                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+              >
+                Add to Exhibition
+              </button>
+            )} */}
           </div>
         ))}
       </div>
@@ -186,77 +225,6 @@ const Chicago: React.FC = () => {
         >
           Next
         </button>
-      </div>
-
-      <div className="mt-10 w-full">
-        <h2 className="text-2xl font-bold mb-4">Your Exhibitions</h2>
-        <div className="mb-4">
-          <input
-            type="text"
-            value={newExhibitionName}
-            onChange={(e) => setNewExhibitionName(e.target.value)}
-            placeholder="New Exhibition Name"
-            className="p-2 border border-gray-400 rounded"
-          />
-          <button
-            onClick={createExhibition}
-            className="ml-2 px-4 py-2 bg-green-500 text-white rounded"
-          >
-            Create your Exhibition
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-4 mb-4">
-          {exhibitions.map((exhibition) => (
-            <button
-              key={exhibition.id}
-              onClick={() => setSelectedExhibition(exhibition.id)}
-              className={`px-4 py-2 rounded ${selectedExhibition === exhibition.id ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-            >
-              {exhibition.name}
-            </button>
-          ))}
-        </div>
-        {selectedExhibition && (
-          <div>
-            <h3 className="text-xl font-bold mb-4">
-              {exhibitions.find((exhibition) => exhibition.id === selectedExhibition)?.name}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {exhibitions
-                .find((exhibition) => exhibition.id === selectedExhibition)
-                ?.artworks.map((artwork) => (
-                  <div
-                    key={artwork.id}
-                    className="bg-white rounded-lg shadow-md p-4 max-w-sm"
-                  >
-                    {artwork.image_id ? (
-                      <img
-                        src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
-                        alt={artwork.title}
-                        className="w-full h-auto rounded mb-4"
-                      />
-                    ) : (
-                      <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
-                        <span className="text-gray-600">No Image Available</span>
-                      </div>
-                    )}
-                    <h2 className="text-xl font-semibold">{artwork.title}</h2>
-                    <p className="text-gray-700">
-                      {artwork.artist_title || "Unknown Artist"}
-                    </p>
-                    <p className="text-gray-500 text-sm">{artwork.place_of_origin}</p>
-                    <p className="text-gray-500 text-sm">Year: {artwork.date_end}</p>
-                    <button
-                      onClick={() => removeArtworkFromExhibition(artwork)}
-                      className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
-                    >
-                      Remove from your Exhibition
-                    </button>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
       </div>
     </main>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchChicagoArtwork } from "../api.ts";
+import { fetchChicagoArtwork } from "../api";
 
 interface Artwork {
   id: number;
@@ -8,6 +8,7 @@ interface Artwork {
   date_end: number;
   place_of_origin: string;
   image_id: string;
+  source: string;
 }
 
 interface Exhibition {
@@ -18,6 +19,7 @@ interface Exhibition {
 
 const Chicago: React.FC = () => {
   const [chicagoArt, setChicagoArt] = useState<Artwork[]>([]);
+  const [filteredArt, setFilteredArt] = useState<Artwork[]>([]);
   const [selectedArtist, setSelectedArtist] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("Newest");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -26,23 +28,13 @@ const Chicago: React.FC = () => {
   const [selectedExhibition, setSelectedExhibition] = useState<number | null>(
     null
   );
-  const [newExhibitionName, setNewExhibitionName] = useState<string>("");
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await fetchChicagoArtwork();
-        setChicagoArt(data.data);
-      } catch (error) {
-        console.error("Error fetching artwork:", error);
-      }
-    }
-
-    fetchData();
-
-    const savedExhibitions = localStorage.getItem("exhibitions");
-    if (savedExhibitions) {
-      setExhibitions(JSON.parse(savedExhibitions));
+    const storedExhibitions = localStorage.getItem("chicago_exhibitions");
+    if (storedExhibitions) {
+      const parsed = JSON.parse(storedExhibitions);
+      setExhibitions(parsed);
+      setSelectedExhibition(parsed[0]?.id || null);
     } else {
       const customExhibition: Exhibition = {
         id: Date.now(),
@@ -55,8 +47,40 @@ const Chicago: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("exhibitions", JSON.stringify(exhibitions));
+    async function fetchData() {
+      try {
+        const data = await fetchChicagoArtwork();
+        setChicagoArt(data.data);
+        setFilteredArt(data.data);
+      } catch (error) {
+        console.error("Error fetching artwork:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (exhibitions.length > 0) {
+      localStorage.setItem("chicago_exhibitions", JSON.stringify(exhibitions));
+    }
   }, [exhibitions]);
+
+  useEffect(() => {
+    const filtered = chicagoArt
+      .filter((art) =>
+        selectedArtist === "All"
+          ? true
+          : (art.artist_title || "Unknown Artist") === selectedArtist
+      )
+      .sort((a, b) =>
+        sortOrder === "Newest"
+          ? b.date_end - a.date_end
+          : a.date_end - b.date_end
+      );
+    setFilteredArt(filtered);
+    setCurrentPage(1);
+  }, [selectedArtist, sortOrder, chicagoArt]);
 
   const artistOptions = [
     "All",
@@ -65,55 +89,48 @@ const Chicago: React.FC = () => {
     ),
   ];
 
-  const filteredAndSortedArt = chicagoArt
-    .filter((art) =>
-      selectedArtist === "All"
-        ? true
-        : (art.artist_title || "Unknown Artist") === selectedArtist
-    )
-    .sort((a, b) =>
-      sortOrder === "Newest" ? b.date_end - a.date_end : a.date_end - b.date_end
-    );
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredAndSortedArt.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-  const totalPages = Math.ceil(filteredAndSortedArt.length / itemsPerPage);
+  const currentItems = filteredArt.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredArt.length / itemsPerPage);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const createExhibition = () => {
-    if (newExhibitionName.trim() === "") return;
-    const newExhibition: Exhibition = {
-      id: Date.now(),
-      name: newExhibitionName,
-      artworks: [],
-    };
-    setExhibitions([...exhibitions, newExhibition]);
-    setNewExhibitionName("");
-  };
+  const saveArtwork = (artwork: Artwork) => {
+    if (selectedExhibition === null) {
+      console.log("No exhibition selected");
+      return;
+    }
 
-  const addArtworkToExhibition = (artwork: Artwork) => {
-    if (selectedExhibition === null) return;
+    console.log("Saving artwork:", artwork);
+
     const updatedExhibitions = exhibitions.map((exhibition) => {
       if (exhibition.id === selectedExhibition) {
-        if (!exhibition.artworks.some((item) => item.id === artwork.id)) {
+        const alreadySaved = exhibition.artworks.some(
+          (item) => item.id === artwork.id
+        );
+        if (!alreadySaved) {
+          const enhancedArtwork = {
+            ...artwork,
+            source: "aic" as const,
+          };
           return {
             ...exhibition,
-            artworks: [...exhibition.artworks, artwork],
+            artworks: [...exhibition.artworks, enhancedArtwork],
           };
+        } else {
+          console.log("Artwork already saved");
         }
       }
       return exhibition;
     });
+
     setExhibitions(updatedExhibitions);
   };
 
-  const removeArtworkFromExhibition = (artwork: Artwork) => {
+  const removeArtwork = (artwork: Artwork) => {
     if (selectedExhibition === null) return;
+
     const updatedExhibitions = exhibitions.map((exhibition) => {
       if (exhibition.id === selectedExhibition) {
         return {
@@ -125,11 +142,13 @@ const Chicago: React.FC = () => {
       }
       return exhibition;
     });
+
     setExhibitions(updatedExhibitions);
   };
 
-  const isArtworkInExhibition = (artwork: Artwork) => {
+  const isArtworkSaved = (artwork: Artwork) => {
     if (selectedExhibition === null) return false;
+
     const exhibition = exhibitions.find(
       (exhibition) => exhibition.id === selectedExhibition
     );
@@ -165,47 +184,51 @@ const Chicago: React.FC = () => {
         </select>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {currentItems.map((artwork) => (
-          <div
-            key={artwork.id}
-            className="bg-white rounded-lg shadow-md p-4 max-w-sm"
-          >
-            {artwork.image_id ? (
-              <img
-                src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
-                alt={artwork.title}
-                className="w-full h-auto rounded mb-4"
-              />
-            ) : (
-              <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
-                <span className="text-gray-600">No Image Available</span>
-              </div>
-            )}
-            <h2 className="text-xl font-semibold">{artwork.title}</h2>
-            <p className="text-gray-700">
-              {artwork.artist_title || "Unknown Artist"}
-            </p>
-            <p className="text-gray-500 text-sm">{artwork.place_of_origin}</p>
-            <p className="text-gray-500 text-sm">Year: {artwork.date_end}</p>
-            {/* {isArtworkInExhibition(artwork) ? (
-              <button
-                onClick={() => removeArtworkFromExhibition(artwork)}
-                className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
-              >
-                Remove from Exhibition
-              </button>
-            ) : (
-              <button
-                onClick={() => addArtworkToExhibition(artwork)}
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-              >
-                Add to Exhibition
-              </button>
-            )} */}
-          </div>
-        ))}
-      </div>
+      {currentItems.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {currentItems.map((artwork) => (
+            <div
+              key={artwork.id}
+              className="bg-white rounded-lg shadow-md p-4 max-w-sm"
+            >
+              {artwork.image_id ? (
+                <img
+                  src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
+                  alt={artwork.title}
+                  className="w-full h-auto rounded mb-4"
+                />
+              ) : (
+                <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
+                  <span className="text-gray-600">No Image Available</span>
+                </div>
+              )}
+              <h2 className="text-xl font-semibold">{artwork.title}</h2>
+              <p className="text-gray-700">
+                {artwork.artist_title || "Unknown Artist"}
+              </p>
+              <p className="text-gray-500 text-sm">{artwork.place_of_origin}</p>
+              <p className="text-gray-500 text-sm">Year: {artwork.date_end}</p>
+              {isArtworkSaved(artwork) ? (
+                <button
+                  onClick={() => removeArtwork(artwork)}
+                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+                >
+                  Remove from Exhibition
+                </button>
+              ) : (
+                <button
+                  onClick={() => saveArtwork(artwork)}
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Add to Exhibition
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-gray-600 mt-5">Loading artworks...</p>
+      )}
 
       <div className="flex justify-center mt-6">
         <button
@@ -225,6 +248,67 @@ const Chicago: React.FC = () => {
         >
           Next
         </button>
+      </div>
+
+      <div className="mt-10 w-full">
+        <h2 className="text-2xl font-bold mb-4">Your Exhibitions</h2>
+        <div className="flex flex-wrap gap-4 mb-4">
+          {exhibitions.map((exhibition) => (
+            <button
+              key={exhibition.id}
+              onClick={() => setSelectedExhibition(exhibition.id)}
+              className={`px-4 py-2 rounded ${
+                selectedExhibition === exhibition.id
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              {exhibition.name}
+            </button>
+          ))}
+        </div>
+        {selectedExhibition && (
+          <div>
+            <h3 className="text-xl font-bold mb-4">
+              {
+                exhibitions.find(
+                  (exhibition) => exhibition.id === selectedExhibition
+                )?.name
+              }
+            </h3>
+            <div className="flex flex-wrap justify-center gap-10 mt-3">
+              {exhibitions
+                .find((exhibition) => exhibition.id === selectedExhibition)
+                ?.artworks.map((artwork, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
+                  >
+                    {artwork && (
+                      <img
+                        src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
+                        alt={artwork.title}
+                        className="mb-4 w-full max-w-xs rounded"
+                      />
+                    )}
+                    <h2 className="text-lg font-bold">{artwork.title} </h2>
+                    <p className="text-md font-semibold">
+                      {artwork.place_of_origin} - {artwork.date_end}
+                    </p>
+                    <p className="text-md text-black">
+                      {artwork.artist_title || "Unknown Artist"}
+                    </p>
+                    <button
+                      onClick={() => removeArtwork(artwork)}
+                      className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+                    >
+                      Remove from your Exhibition
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

@@ -18,7 +18,6 @@ export const fetchMetEuropeanArtIDs = async () => {
     const response = await axios.get(
       "https://collectionapi.metmuseum.org/public/collection/v1/search?q=European&medium=Paintings&hasImages=true"
     );
-    console.log(response.data)
     return response.data.objectIDs;
   } catch (error) {
     console.log(error);
@@ -30,7 +29,6 @@ export const fetchMetObjectById = async (id: number) => {
     const response = await axios.get(
       `https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`
     );
-    console.log(response.data);
     return response.data;
   } catch (error) {
     console.log(error);

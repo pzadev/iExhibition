@@ -12,7 +12,7 @@ function Met() {
   };
 
   type Exhibition = {
-    id: number;
+    id: string;
     name: string;
     artworks: MetArtwork[];
   };
@@ -24,7 +24,7 @@ function Met() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage] = useState<number>(6);
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
-  const [selectedExhibition, setSelectedExhibition] = useState<number | null>(
+  const [selectedExhibition, setSelectedExhibition] = useState<string | null>(
     null
   );
 
@@ -36,7 +36,7 @@ function Met() {
       setSelectedExhibition(parsed[0]?.id || null);
     } else {
       const customExhibition: Exhibition = {
-        id: Date.now(),
+       id: `met-${Date.now()}`,
         name: "Your Custom Exhibition",
         artworks: [],
       };
@@ -54,7 +54,7 @@ function Met() {
   useEffect(() => {
     const fetchMetData = async () => {
       const ids = await fetchMetEuropeanArtIDs();
-      const sliced = ids.slice(0, 25);
+      const sliced = ids.slice(0, 50);
 
       const objectPromises = sliced.map((id: number) => fetchMetObjectById(id));
       const artworks = await Promise.all(objectPromises);
@@ -155,7 +155,7 @@ function Met() {
     <>
       <div className="flex-col"></div>
 
-      <h1 className="font-medium text-center text-2xl mt-10">Met Art Museum</h1>
+      <h1 className="font-medium text-center text-2xl mt-10 mb-4">Met Art Museum</h1>
 
       <div className="flex flex-wrap gap-4 justify-center mb-6">
         <select

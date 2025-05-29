@@ -31,11 +31,33 @@ const Exhibition: React.FC = () => {
   );
 
   useEffect(() => {
-    const storedExhibitions = localStorage.getItem("met_exhibitions");
-    if (storedExhibitions) {
-      const parsed: Exhibition[] = JSON.parse(storedExhibitions);
-      setExhibitions(parsed);
-      setSelectedExhibition(parsed[0]?.id || null);
+    const allExhibitions: Exhibition[] = [];
+
+    const metRaw = localStorage.getItem("met_exhibitions");
+    console.log("metRaw:", metRaw);
+    if (metRaw) {
+      try {
+        const metExhibitions: Exhibition[] = JSON.parse(metRaw);
+        allExhibitions.push(...metExhibitions);
+      } catch (err) {
+        console.error("Failed to parse met_exhibitions:", err);
+      }
+    }
+
+    const chicagoRaw = localStorage.getItem("chicago_exhibitions");
+    console.log("chicagoRaw:", chicagoRaw);
+    if (chicagoRaw) {
+      try {
+        const chicagoExhibitions: Exhibition[] = JSON.parse(chicagoRaw);
+        allExhibitions.push(...chicagoExhibitions);
+      } catch (err) {
+        console.error("Failed to parse chicago_exhibitions:", err);
+      }
+    }
+
+    if (allExhibitions.length > 0) {
+      setExhibitions(allExhibitions);
+      setSelectedExhibition(allExhibitions[0]?.id || null);
     } else {
       const customExhibition: Exhibition = {
         id: Date.now(),
@@ -63,7 +85,23 @@ const Exhibition: React.FC = () => {
     });
 
     setExhibitions(updatedExhibitions);
-    localStorage.setItem("met_exhibitions", JSON.stringify(updatedExhibitions));
+
+    const originalExhibition = exhibitions.find(
+      (ex) => ex.id === selectedExhibition
+    );
+
+    if (originalExhibition) {
+      const source = originalExhibition.artworks[0]?.source || artwork.source;
+
+      const storageKey =
+        source === "aic" ? "chicago_exhibitions" : "met_exhibitions";
+
+      const updatedSubset = updatedExhibitions.filter((exhibition) =>
+        exhibition.artworks.some((art) => art.source === source)
+      );
+
+      localStorage.setItem(storageKey, JSON.stringify(updatedSubset));
+    }
   };
 
   const selected = exhibitions.find(

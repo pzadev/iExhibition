@@ -8,9 +8,9 @@ function Bar() {
   const currentPath = window.location.pathname;
 
   return (
-    <header className="w-full bg-white dark:bg-gray-900 border-b-2 border-gray-400 dark:border-gray-700 shadow px-4 py-5 flex items-center justify-between">
+    <header className="w-full bg-white dark:bg-blue-900 border-b-2 border-gray-400 dark:border-gray-700 shadow px-4 py-5 flex items-center justify-between">
       <div className="text-3xl font-bold text-gray-800 dark:text-white">
-        iMuseum
+        iExhibition
       </div>
 
       <div className="flex gap-4 items-center">

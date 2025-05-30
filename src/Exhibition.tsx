@@ -33,25 +33,14 @@ const Exhibition: React.FC = () => {
   useEffect(() => {
     const allExhibitions: Exhibition[] = [];
 
-    const metRaw = localStorage.getItem("met_exhibitions");
-    console.log("metRaw:", metRaw);
-    if (metRaw) {
+    const exhibitionRaw = localStorage.getItem("custom_exhibition");
+    console.log("exhibitionRaw:", exhibitionRaw);
+    if (exhibitionRaw) {
       try {
-        const metExhibitions: Exhibition[] = JSON.parse(metRaw);
-        allExhibitions.push(...metExhibitions);
+        const exhibitioNData: Exhibition[] = JSON.parse(exhibitionRaw);
+        allExhibitions.push(...exhibitioNData);
       } catch (err) {
-        console.error("Failed to parse met_exhibitions:", err);
-      }
-    }
-
-    const chicagoRaw = localStorage.getItem("chicago_exhibitions");
-    console.log("chicagoRaw:", chicagoRaw);
-    if (chicagoRaw) {
-      try {
-        const chicagoExhibitions: Exhibition[] = JSON.parse(chicagoRaw);
-        allExhibitions.push(...chicagoExhibitions);
-      } catch (err) {
-        console.error("Failed to parse chicago_exhibitions:", err);
+        console.error("Failed to parse exhibitionData:", err);
       }
     }
 
@@ -158,17 +147,21 @@ const Exhibition: React.FC = () => {
                 <h2 className="text-xl font-semibold">{artwork.title}</h2>
 
                 <p className="text-gray-700">
-                  {artwork.artist_title ||
+                  Artist: {artwork.artist_title ||
                     artwork.artistDisplayName ||
                     "Unknown Artist"}
                 </p>
 
-                <p className="text-gray-500 text-sm">
-                  {artwork.place_of_origin || artwork.artistNationality || ""}
+                <p className="text-gray-700 text-sm">
+                Artist Origin: {artwork.place_of_origin || artwork.artistNationality || ""}
                 </p>
 
                 <p className="text-gray-500 text-sm">
                   Year: {artwork.date_end || artwork.accessionYear || "Unknown"}
+                </p>
+
+                <p className="text-gray-500 text-sm"> 
+                  {artwork.source === 'met' ? "Metropolitan Museum of Art" : "Chicago Art Institute"}
                 </p>
 
                 <button

@@ -3,22 +3,33 @@ import { fetchMetObjectById, fetchMetEuropeanArtIDs } from "../api";
 import { useEffect, useState } from "react";
 
 function Met() {
-  type MetArtwork = {
-    accessionYear: number;
-    artistDisplayName: string;
-    title: string;
-    primaryImage: string;
-    artistNationality: string;
-  };
+
+ type Source = "aic" | "met";
+
+interface Artwork {
+  id: number;
+  title: string;
+  source: Source;
+
+  artist_title?: string;
+  date_end?: number;
+  place_of_origin?: string;
+  image_id?: string;
+
+  artistDisplayName?: string;
+  accessionYear?: number;
+  artistNationality?: string;
+  primaryImage?: string;
+}
 
   type Exhibition = {
     id: string;
     name: string;
-    artworks: MetArtwork[];
+    artworks: Artwork[];
   };
 
-  const [metArt, setMetArt] = useState<MetArtwork[]>([]);
-  const [filteredArt, setFilteredArt] = useState<MetArtwork[]>([]);
+  const [metArt, setMetArt] = useState<Artwork[]>([]);
+  const [filteredArt, setFilteredArt] = useState<Artwork[]>([]);
   const [selectedNationality, setSelectedNationality] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("Newest");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -29,7 +40,7 @@ function Met() {
   );
 
   useEffect(() => {
-    const storedExhibitions = localStorage.getItem("met_exhibitions");
+    const storedExhibitions = localStorage.getItem("custom_exhibition");
     if (storedExhibitions) {
       const parsed = JSON.parse(storedExhibitions);
       setExhibitions(parsed);
@@ -47,7 +58,7 @@ function Met() {
 
   useEffect(() => {
     if (exhibitions.length > 0) {
-      localStorage.setItem("met_exhibitions", JSON.stringify(exhibitions));
+      localStorage.setItem("custom_exhibition", JSON.stringify(exhibitions));
     }
   }, [exhibitions]);
 
@@ -79,8 +90,8 @@ function Met() {
       )
       .sort((a, b) =>
         sortOrder === "Newest"
-          ? b.accessionYear - a.accessionYear
-          : a.accessionYear - b.accessionYear
+          ? (b.accessionYear ?? 0) - (a.accessionYear ?? 0)
+          : (a.accessionYear ?? 0) - (b.accessionYear ?? 0)
       );
     setFilteredArt(filtered);
     setCurrentPage(1);
@@ -98,7 +109,7 @@ function Met() {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const saveArtwork = (artwork: MetArtwork) => {
+  const saveArtwork = (artwork: Artwork) => {
     if (selectedExhibition === null) return;
 
     const updatedExhibitions = exhibitions.map((exhibition) => {
@@ -123,7 +134,7 @@ function Met() {
     setExhibitions(updatedExhibitions);
   };
 
-  const removeArtwork = (artwork: MetArtwork) => {
+  const removeArtwork = (artwork: Artwork) => {
     if (selectedExhibition === null) return;
 
     const updatedExhibitions = exhibitions.map((exhibition) => {
@@ -140,7 +151,7 @@ function Met() {
     setExhibitions(updatedExhibitions);
   };
 
-  const isArtworkSaved = (artwork: MetArtwork) => {
+  const isArtworkSaved = (artwork: Artwork) => {
     if (selectedExhibition === null) return false;
 
     const exhibition = exhibitions.find(
@@ -277,19 +288,48 @@ function Met() {
                     key={index}
                     className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
                   >
-                    {artwork && (
+                     {artwork.source === "aic" && artwork.image_id ? (
+                      <img
+                        src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
+                        alt={artwork.title}
+                        className="mb-4 w-60 h-60 rounded"
+                      />
+                    ) : artwork.source === "met" && artwork.primaryImage ? (
                       <img
                         src={artwork.primaryImage}
                         alt={artwork.title}
-                        className="mb-4 w-full max-w-xs rounded"
+                        className="mb-4 w-60 h-60 rounded"
                       />
+                    ) : (
+                      <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
+                        <span className="text-gray-600">
+                          No Image Available
+                        </span>
+                      </div>
                     )}
-                    <h2 className="text-lg font-bold">{artwork.title} </h2>
+
+                      <h2 className="text-lg font-bold">{artwork.title}</h2>
                     <p className="text-md font-semibold">
-                      {artwork.artistNationality} - {artwork.accessionYear}
+                      {artwork.place_of_origin ||
+                        artwork.artistNationality ||
+                        ""}
                     </p>
-                    <p className="text-md text-black">
-                      {artwork.artistDisplayName || "Unknown Artist"}
+                    <p className="text-gray-700">
+                      Artist:{" "}
+                      {artwork.artist_title ||
+                        artwork.artistDisplayName ||
+                        "Unknown Artist"}
+                    </p>
+
+                    <p className="text-gray-500 text-sm">
+                      Year:{" "}
+                      {artwork.date_end || artwork.accessionYear || "Unknown"}
+                    </p>
+
+                    <p className="text-gray-500 text-sm">
+                      {artwork.source === "met"
+                        ? "Metropolitan Museum of Art"
+                        : "Chicago Art Institute"}
                     </p>
                     <button
                       onClick={() => removeArtwork(artwork)}

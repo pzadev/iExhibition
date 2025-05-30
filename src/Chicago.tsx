@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
 import { fetchChicagoArtwork } from "../api";
 
+type Source = "aic" | "met";
+
 interface Artwork {
   id: number;
   title: string;
-  artist_title: string;
-  date_end: number;
-  place_of_origin: string;
-  image_id: string;
-  source: string;
+  source: Source;
+
+  artist_title?: string;
+  date_end?: number;
+  place_of_origin?: string;
+  image_id?: string;
+
+  artistDisplayName?: string;
+  accessionYear?: number;
+  artistNationality?: string;
+  primaryImage?: string;
 }
 
 interface Exhibition {
@@ -30,19 +38,30 @@ const Chicago: React.FC = () => {
   );
 
   useEffect(() => {
-    const storedExhibitions = localStorage.getItem("chicago_exhibitions");
-    if (storedExhibitions) {
-      const parsed = JSON.parse(storedExhibitions);
-      setExhibitions(parsed);
-      setSelectedExhibition(parsed[0]?.id || null);
-    } else {
-      const customExhibition: Exhibition = {
+    const storedExhibitions = localStorage.getItem("custom_exhibition");
+    let parsed: Exhibition[] = [];
+
+    try {
+      parsed = storedExhibitions ? JSON.parse(storedExhibitions) : [];
+    } catch (e) {
+      console.error("Failed to parse stored exhibitions:", e);
+    }
+
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      const defaultExhibition: Exhibition = {
         id: Date.now(),
-        name: "Your Custom Exhibition",
+        name: "My Exhibition",
         artworks: [],
       };
-      setExhibitions([customExhibition]);
-      setSelectedExhibition(customExhibition.id);
+      setExhibitions([defaultExhibition]);
+      setSelectedExhibition(defaultExhibition.id);
+      localStorage.setItem(
+        "custom_exhibition",
+        JSON.stringify([defaultExhibition])
+      );
+    } else {
+      setExhibitions(parsed);
+      setSelectedExhibition(parsed[0]?.id || null);
     }
   }, []);
 
@@ -62,7 +81,7 @@ const Chicago: React.FC = () => {
 
   useEffect(() => {
     if (exhibitions.length > 0) {
-      localStorage.setItem("chicago_exhibitions", JSON.stringify(exhibitions));
+      localStorage.setItem("custom_exhibition", JSON.stringify(exhibitions));
     }
   }, [exhibitions]);
 
@@ -75,9 +94,10 @@ const Chicago: React.FC = () => {
       )
       .sort((a, b) =>
         sortOrder === "Newest"
-          ? b.date_end - a.date_end
-          : a.date_end - b.date_end
+          ? (b.date_end ?? 0) - (a.date_end ?? 0)
+          : (a.date_end ?? 0) - (b.date_end ?? 0)
       );
+
     setFilteredArt(filtered);
     setCurrentPage(1);
   }, [selectedArtist, sortOrder, chicagoArt]);
@@ -195,7 +215,7 @@ const Chicago: React.FC = () => {
                 <img
                   src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
                   alt={artwork.title}
-                  className="w-full h-auto rounded mb-4"
+                  className="w-100 h-100 rounded mb-4"
                 />
               ) : (
                 <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
@@ -251,8 +271,10 @@ const Chicago: React.FC = () => {
       </div>
 
       <div className="mt-10 w-full">
-        <h2 className="text-2xl font-bold mb-4">Your Exhibitions</h2>
-        <div className="flex flex-wrap gap-4 mb-4">
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          Your Exhibitions
+        </h2>
+        <div className="flex flex-wrap gap-4 mb-4 justify-center text-center">
           {exhibitions.map((exhibition) => (
             <button
               key={exhibition.id}
@@ -269,7 +291,7 @@ const Chicago: React.FC = () => {
         </div>
         {selectedExhibition && (
           <div>
-            <h3 className="text-xl font-bold mb-4">
+            <h3 className="text-xl font-bold  mb-4">
               {
                 exhibitions.find(
                   (exhibition) => exhibition.id === selectedExhibition
@@ -284,20 +306,50 @@ const Chicago: React.FC = () => {
                     key={index}
                     className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
                   >
-                    {artwork && (
+                    {artwork.source === "aic" && artwork.image_id ? (
                       <img
                         src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
                         alt={artwork.title}
-                        className="mb-4 w-full max-w-xs rounded"
+                        className="mb-4 w-60 h-60 rounded"
                       />
+                    ) : artwork.source === "met" && artwork.primaryImage ? (
+                      <img
+                        src={artwork.primaryImage}
+                        alt={artwork.title}
+                        className="mb-4 w-60 h-60 rounded"
+                      />
+                    ) : (
+                      <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
+                        <span className="text-gray-600">
+                          No Image Available
+                        </span>
+                      </div>
                     )}
-                    <h2 className="text-lg font-bold">{artwork.title} </h2>
+
+                    <h2 className="text-lg font-bold">{artwork.title}</h2>
                     <p className="text-md font-semibold">
-                      {artwork.place_of_origin} - {artwork.date_end}
+                      {artwork.place_of_origin ||
+                        artwork.artistNationality ||
+                        ""}
                     </p>
-                    <p className="text-md text-black">
-                      {artwork.artist_title || "Unknown Artist"}
+                    <p className="text-gray-700">
+                      Artist:{" "}
+                      {artwork.artist_title ||
+                        artwork.artistDisplayName ||
+                        "Unknown Artist"}
                     </p>
+
+                    <p className="text-gray-500 text-sm">
+                      Year:{" "}
+                      {artwork.date_end || artwork.accessionYear || "Unknown"}
+                    </p>
+
+                    <p className="text-gray-500 text-sm">
+                      {artwork.source === "met"
+                        ? "Metropolitan Museum of Art"
+                        : "Chicago Art Institute"}
+                    </p>
+
                     <button
                       onClick={() => removeArtwork(artwork)}
                       className="mt-2 px-4 py-2 bg-red-500 text-white rounded"

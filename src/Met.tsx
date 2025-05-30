@@ -1,26 +1,27 @@
 import "./App.css";
 import { fetchMetObjectById, fetchMetEuropeanArtIDs } from "../api";
 import { useEffect, useState } from "react";
+import Lottie from "lottie-react";
+import exhibitionLoading from "../src/assets/ExhibitionLoading.json";
 
 function Met() {
+  type Source = "aic" | "met";
 
- type Source = "aic" | "met";
+  interface Artwork {
+    id: number;
+    title: string;
+    source: Source;
 
-interface Artwork {
-  id: number;
-  title: string;
-  source: Source;
+    artist_title?: string;
+    date_end?: number;
+    place_of_origin?: string;
+    image_id?: string;
 
-  artist_title?: string;
-  date_end?: number;
-  place_of_origin?: string;
-  image_id?: string;
-
-  artistDisplayName?: string;
-  accessionYear?: number;
-  artistNationality?: string;
-  primaryImage?: string;
-}
+    artistDisplayName?: string;
+    accessionYear?: number;
+    artistNationality?: string;
+    primaryImage?: string;
+  }
 
   type Exhibition = {
     id: string;
@@ -30,14 +31,15 @@ interface Artwork {
 
   const [metArt, setMetArt] = useState<Artwork[]>([]);
   const [filteredArt, setFilteredArt] = useState<Artwork[]>([]);
-  const [selectedNationality, setSelectedNationality] = useState<string>("All");
+  const [selectedArtist, setSelectedArtist] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("Newest");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(6);
+  const [itemsPerPage] = useState<number>(12);
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [selectedExhibition, setSelectedExhibition] = useState<string | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const storedExhibitions = localStorage.getItem("custom_exhibition");
@@ -47,7 +49,7 @@ interface Artwork {
       setSelectedExhibition(parsed[0]?.id || null);
     } else {
       const customExhibition: Exhibition = {
-       id: `met-${Date.now()}`,
+        id: `met-${Date.now()}`,
         name: "Your Custom Exhibition",
         artworks: [],
       };
@@ -64,18 +66,27 @@ interface Artwork {
 
   useEffect(() => {
     const fetchMetData = async () => {
-      const ids = await fetchMetEuropeanArtIDs();
-      const sliced = ids.slice(0, 50);
+      try {
+        setIsLoading(true);
+        const ids = await fetchMetEuropeanArtIDs();
+        const sliced = ids.slice(0, 50);
 
-      const objectPromises = sliced.map((id: number) => fetchMetObjectById(id));
-      const artworks = await Promise.all(objectPromises);
+        const objectPromises = sliced.map((id: number) =>
+          fetchMetObjectById(id)
+        );
+        const artworks = await Promise.all(objectPromises);
 
-      const filtered = artworks.filter(
-        (artwork) => artwork.primaryImage !== ""
-      );
+        const filtered = artworks.filter(
+          (artwork) => artwork.primaryImage !== ""
+        );
 
-      setMetArt(filtered);
-      setFilteredArt(filtered);
+        setMetArt(filtered);
+        setFilteredArt(filtered);
+      } catch (error) {
+        console.error("Error fetching Met data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchMetData();
@@ -84,9 +95,9 @@ interface Artwork {
   useEffect(() => {
     const filtered = metArt
       .filter((art) =>
-        selectedNationality === "All"
+        selectedArtist === "All"
           ? true
-          : art.artistNationality === selectedNationality
+          : art.artistDisplayName === selectedArtist
       )
       .sort((a, b) =>
         sortOrder === "Newest"
@@ -95,11 +106,11 @@ interface Artwork {
       );
     setFilteredArt(filtered);
     setCurrentPage(1);
-  }, [selectedNationality, sortOrder, metArt]);
+  }, [selectedArtist, sortOrder, metArt]);
 
-  const nationalityOptions = [
+  const artistOptions = [
     "All",
-    ...Array.from(new Set(metArt.map((art) => art.artistNationality))),
+    ...Array.from(new Set(metArt.map((art) => art.artistDisplayName))),
   ];
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -162,21 +173,35 @@ interface Artwork {
     );
   };
 
-  return (
+  return isLoading ? (
+    <div className="flex flex-col justify-center items-center h-130">
+      <Lottie
+        animationData={exhibitionLoading}
+        loop
+        autoplay
+        className="w-100 h-100 "
+      />
+      <p className="text-2xl font-bold mt-3 text-black">
+        Loading Met Museum's Exhibition!
+      </p>
+    </div>
+  ) : (
     <>
       <div className="flex-col"></div>
 
-      <h1 className="font-medium text-center text-2xl mt-10 mb-4">Met Art Museum</h1>
+      <h1 className="font-medium text-center text-2xl mt-5 mb-4">
+        Met Art Museum Exhibition
+      </h1>
 
       <div className="flex flex-wrap gap-4 justify-center mb-6">
         <select
-          value={selectedNationality}
-          onChange={(e) => setSelectedNationality(e.target.value)}
+          value={selectedArtist}
+          onChange={(e) => setSelectedArtist(e.target.value)}
           className="p-2 border border-gray-400 rounded"
         >
-          {nationalityOptions.map((nationality, idx) => (
-            <option key={idx} value={nationality}>
-              {nationality}
+          {artistOptions.map((artist, idx) => (
+            <option key={idx} value={artist}>
+              {artist}
             </option>
           ))}
         </select>
@@ -196,13 +221,13 @@ interface Artwork {
           {currentItems.map((artwork, index) => (
             <div
               key={index}
-              className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
+              className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center"
             >
               {artwork && (
                 <img
                   src={artwork.primaryImage}
                   alt={artwork.title}
-                  className="mb-4 w-full max-w-xs rounded"
+                   className="mb-4 w-90 h-70 rounded"
                 />
               )}
               <h2 className="text-lg font-bold">{artwork.title} </h2>
@@ -217,21 +242,21 @@ interface Artwork {
                   onClick={() => removeArtwork(artwork)}
                   className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
                 >
-                  Remove from Exhibition
+                  Remove from your Exhibition
                 </button>
               ) : (
                 <button
                   onClick={() => saveArtwork(artwork)}
                   className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
                 >
-                  Save to Exhibition
+                  Save to your Exhibition
                 </button>
               )}
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-600 mt-5">Loading artworks...</p>
+        ""
       )}
 
       <div className="flex justify-center mt-6">
@@ -255,8 +280,10 @@ interface Artwork {
       </div>
 
       <div className="mt-10 w-full">
-        <h2 className="text-2xl font-bold mb-4">Your Exhibitions</h2>
-        <div className="flex flex-wrap gap-4 mb-4">
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          Your Exhibitions
+        </h2>
+        <div className="flex flex-wrap gap-4 mb-4 justify-center">
           {exhibitions.map((exhibition) => (
             <button
               key={exhibition.id}
@@ -288,7 +315,7 @@ interface Artwork {
                     key={index}
                     className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
                   >
-                     {artwork.source === "aic" && artwork.image_id ? (
+                    {artwork.source === "aic" && artwork.image_id ? (
                       <img
                         src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
                         alt={artwork.title}
@@ -308,7 +335,7 @@ interface Artwork {
                       </div>
                     )}
 
-                      <h2 className="text-lg font-bold">{artwork.title}</h2>
+                    <h2 className="text-lg font-bold">{artwork.title}</h2>
                     <p className="text-md font-semibold">
                       {artwork.place_of_origin ||
                         artwork.artistNationality ||

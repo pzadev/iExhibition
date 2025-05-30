@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchChicagoArtwork } from "../api";
+import Lottie from "lottie-react";
+import exhibitionLoading from "../src/assets/ExhibitionLoading.json";
 
 type Source = "aic" | "met";
 
@@ -36,6 +38,7 @@ const Chicago: React.FC = () => {
   const [selectedExhibition, setSelectedExhibition] = useState<number | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const storedExhibitions = localStorage.getItem("custom_exhibition");
@@ -68,11 +71,14 @@ const Chicago: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       try {
+        setIsLoading(true);
         const data = await fetchChicagoArtwork();
         setChicagoArt(data.data);
         setFilteredArt(data.data);
       } catch (error) {
         console.error("Error fetching artwork:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -175,10 +181,22 @@ const Chicago: React.FC = () => {
     return exhibition?.artworks.some((item) => item.id === artwork.id) || false;
   };
 
-  return (
+  return isLoading ? (
+    <div className="flex flex-col justify-center items-center h-130">
+      <Lottie
+        animationData={exhibitionLoading}
+        loop
+        autoplay
+        className="w-100 h-100"
+      />
+      <p className="text-2xl font-bold mt-3 text-black">
+        Loading Chicago Museum's Exhibition!
+      </p>
+    </div>
+  ) : (
     <main className="flex flex-col items-center justify-center px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">
-        Artworks Related to Chicago
+        Chicago Art Museum Exhibition
       </h1>
 
       <div className="flex flex-wrap gap-4 justify-center mb-6">
@@ -209,13 +227,13 @@ const Chicago: React.FC = () => {
           {currentItems.map((artwork) => (
             <div
               key={artwork.id}
-              className="bg-white rounded-lg shadow-md p-4 max-w-sm"
+              className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center"
             >
               {artwork.image_id ? (
                 <img
                   src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
                   alt={artwork.title}
-                  className="w-100 h-100 rounded mb-4"
+                  className="mb-4 w-90 h-70 rounded"
                 />
               ) : (
                 <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
@@ -233,21 +251,21 @@ const Chicago: React.FC = () => {
                   onClick={() => removeArtwork(artwork)}
                   className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
                 >
-                  Remove from Exhibition
+                  Remove from your Exhibition
                 </button>
               ) : (
                 <button
                   onClick={() => saveArtwork(artwork)}
                   className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
                 >
-                  Add to Exhibition
+                  Save to your Exhibition
                 </button>
               )}
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-600 mt-5">Loading artworks...</p>
+        ""
       )}
 
       <div className="flex justify-center mt-6">
@@ -274,6 +292,7 @@ const Chicago: React.FC = () => {
         <h2 className="text-2xl font-bold mb-4 text-center">
           Your Exhibitions
         </h2>
+
         <div className="flex flex-wrap gap-4 mb-4 justify-center text-center">
           {exhibitions.map((exhibition) => (
             <button
@@ -289,9 +308,19 @@ const Chicago: React.FC = () => {
             </button>
           ))}
         </div>
-        {selectedExhibition && (
+
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <Lottie
+              animationData={exhibitionLoading}
+              loop
+              autoplay
+              className="w-60 h-60"
+            />
+          </div>
+        ) : selectedExhibition ? (
           <div>
-            <h3 className="text-xl font-bold  mb-4">
+            <h3 className="text-xl font-bold mb-4">
               {
                 exhibitions.find(
                   (exhibition) => exhibition.id === selectedExhibition
@@ -304,7 +333,7 @@ const Chicago: React.FC = () => {
                 ?.artworks.map((artwork, index) => (
                   <div
                     key={index}
-                    className="bg-gray-200 w-90 h-auto p-6 rounded-lg shadow-md flex flex-col items-center text-center"
+                    className="bg-gray-200 w-90 h-110 p-4 rounded-lg shadow-md flex flex-col items-center text-center"
                   >
                     {artwork.source === "aic" && artwork.image_id ? (
                       <img
@@ -338,18 +367,15 @@ const Chicago: React.FC = () => {
                         artwork.artistDisplayName ||
                         "Unknown Artist"}
                     </p>
-
                     <p className="text-gray-500 text-sm">
                       Year:{" "}
                       {artwork.date_end || artwork.accessionYear || "Unknown"}
                     </p>
-
                     <p className="text-gray-500 text-sm">
                       {artwork.source === "met"
                         ? "Metropolitan Museum of Art"
                         : "Chicago Art Institute"}
                     </p>
-
                     <button
                       onClick={() => removeArtwork(artwork)}
                       className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
@@ -360,7 +386,7 @@ const Chicago: React.FC = () => {
                 ))}
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </main>
   );

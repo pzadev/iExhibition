@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const chicagoAPI = "https://api.artic.edu/api/v1/artworks";
-// const aussieAPI = "https://data.nma.gov.au/object/14693";
+const chicagoAPI = "https://api.artic.edu/api/v1/artworks?limit=100";
 
 export const fetchChicagoArtwork = async () => {
   try {

@@ -2,7 +2,7 @@ function Home() {
   return (
     <>
       <div className="flex-col">
-        <h1 className="text-2xl font-bold text-gray-800 mt-2 mb-2">Welcome to iExhibition</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mt-2 mb-2 text-center">Welcome to iExhibition</h1>
         <div className="flex-row">
 <div className="flex flex-wrap gap-10 mt-3 justify-center">
             <span

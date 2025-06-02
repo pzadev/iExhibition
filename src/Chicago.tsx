@@ -198,6 +198,11 @@ const Chicago: React.FC = () => {
       <h1 className="text-3xl font-bold mb-6 text-center">
         Chicago Art Museum Exhibition
       </h1>
+      <p className="text-lg text-gray-600 text-center mb-8 max-w-2xl">
+        Discover Chicago's rich art collection and curate your own exhibition by
+        saving artworks to your personal collection. You can filter by artist
+        and sort by year, making it easy to explore the museum's treasures.
+      </p>
 
       <div className="flex flex-wrap gap-4 justify-center mb-6">
         <select
@@ -320,13 +325,6 @@ const Chicago: React.FC = () => {
           </div>
         ) : selectedExhibition ? (
           <div>
-            <h3 className="text-xl font-bold mb-4">
-              {
-                exhibitions.find(
-                  (exhibition) => exhibition.id === selectedExhibition
-                )?.name
-              }
-            </h3>
             <div className="flex flex-wrap justify-center gap-10 mt-3">
               {exhibitions
                 .find((exhibition) => exhibition.id === selectedExhibition)

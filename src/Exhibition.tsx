@@ -75,22 +75,12 @@ const Exhibition: React.FC = () => {
 
     setExhibitions(updatedExhibitions);
 
-    const originalExhibition = exhibitions.find(
-      (ex) => ex.id === selectedExhibition
+   
+
+    localStorage.setItem(
+      "custom_exhibition",
+      JSON.stringify(updatedExhibitions)
     );
-
-    if (originalExhibition) {
-      const source = originalExhibition.artworks[0]?.source || artwork.source;
-
-      const storageKey =
-        source === "aic" ? "chicago_exhibitions" : "met_exhibitions";
-
-      const updatedSubset = updatedExhibitions.filter((exhibition) =>
-        exhibition.artworks.some((art) => art.source === source)
-      );
-
-      localStorage.setItem(storageKey, JSON.stringify(updatedSubset));
-    }
   };
 
   const selected = exhibitions.find(
@@ -99,7 +89,7 @@ const Exhibition: React.FC = () => {
 
   return (
     <main className="flex flex-col items-center justify-center px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">Your Exhibitions</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Your Exhibition</h1>
 
       <div className="flex flex-wrap gap-4 mb-4">
         {exhibitions.map((exhibition) => (
@@ -119,7 +109,6 @@ const Exhibition: React.FC = () => {
 
       {selected && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">{selected.name}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {selected.artworks.map((artwork) => (
               <div
@@ -147,21 +136,25 @@ const Exhibition: React.FC = () => {
                 <h2 className="text-xl font-semibold">{artwork.title}</h2>
 
                 <p className="text-gray-700">
-                  Artist: {artwork.artist_title ||
+                  Artist:{" "}
+                  {artwork.artist_title ||
                     artwork.artistDisplayName ||
                     "Unknown Artist"}
                 </p>
 
                 <p className="text-gray-700 text-sm">
-                Artist Origin: {artwork.place_of_origin || artwork.artistNationality || ""}
+                  Artist Origin:{" "}
+                  {artwork.place_of_origin || artwork.artistNationality || ""}
                 </p>
 
                 <p className="text-gray-500 text-sm">
                   Year: {artwork.date_end || artwork.accessionYear || "Unknown"}
                 </p>
 
-                <p className="text-gray-500 text-sm"> 
-                  {artwork.source === 'met' ? "Metropolitan Museum of Art" : "Chicago Art Institute"}
+                <p className="text-gray-500 text-sm">
+                  {artwork.source === "met"
+                    ? "Metropolitan Museum of Art"
+                    : "Chicago Art Institute"}
                 </p>
 
                 <button

@@ -5,6 +5,7 @@ import Home from "./Home";
 import Chicago from "./Chicago";
 import Met from "./Met";
 import Exhibition from "./Exhibition";
+import Footer from "./Footer";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/exhibition" element={<Exhibition />} />
         </Routes>
       </div>
+        <Footer />
     </div>
   );
 }

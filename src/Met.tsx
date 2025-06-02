@@ -187,97 +187,104 @@ function Met() {
     </div>
   ) : (
     <>
-      <div className="flex-col"></div>
+      <main className="flex flex-col items-center justify-center px-4 py-8">
+        <h1 className="font-medium text-center text-2xl mt-5 mb-4">
+          Met Art Museum Exhibition
+        </h1>
 
-      <h1 className="font-medium text-center text-2xl mt-5 mb-4">
-        Met Art Museum Exhibition
-      </h1>
+        <p className="text-lg text-gray-600 text-center mb-8 max-w-2xl">
+          Discover the MET's rich art collection and curate your own exhibition
+          by saving artworks to your personal collection. You can filter by
+          artist and sort by year, making it easy to explore the museum's
+          treasures.
+        </p>
 
-      <div className="flex flex-wrap gap-4 justify-center mb-6">
-        <select
-          value={selectedArtist}
-          onChange={(e) => setSelectedArtist(e.target.value)}
-          className="p-2 border border-gray-400 rounded"
-        >
-          {artistOptions.map((artist, idx) => (
-            <option key={idx} value={artist}>
-              {artist}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-wrap gap-4 justify-center mb-6">
+          <select
+            value={selectedArtist}
+            onChange={(e) => setSelectedArtist(e.target.value)}
+            className="p-2 border border-gray-400 rounded"
+          >
+            {artistOptions.map((artist, idx) => (
+              <option key={idx} value={artist}>
+                {artist}
+              </option>
+            ))}
+          </select>
 
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-          className="p-2 border border-gray-400 rounded"
-        >
-          <option value="Newest">Newest First</option>
-          <option value="Oldest">Oldest First</option>
-        </select>
-      </div>
-
-      {currentItems.length > 0 ? (
-        <div className="flex flex-wrap justify-center gap-10 mt-3">
-          {currentItems.map((artwork, index) => (
-            <div
-              key={index}
-              className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center"
-            >
-              {artwork && (
-                <img
-                  src={artwork.primaryImage}
-                  alt={artwork.title}
-                   className="mb-4 w-90 h-70 rounded"
-                />
-              )}
-              <h2 className="text-lg font-bold">{artwork.title} </h2>
-              <p className="text-md font-semibold">
-                {artwork.artistNationality} - {artwork.accessionYear}
-              </p>
-              <p className="text-md text-black">
-                {artwork.artistDisplayName || "Unknown Artist"}
-              </p>
-              {isArtworkSaved(artwork) ? (
-                <button
-                  onClick={() => removeArtwork(artwork)}
-                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
-                >
-                  Remove from your Exhibition
-                </button>
-              ) : (
-                <button
-                  onClick={() => saveArtwork(artwork)}
-                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-                >
-                  Save to your Exhibition
-                </button>
-              )}
-            </div>
-          ))}
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="p-2 border border-gray-400 rounded"
+          >
+            <option value="Newest">Newest First</option>
+            <option value="Oldest">Oldest First</option>
+          </select>
         </div>
-      ) : (
-        ""
-      )}
 
-      <div className="flex justify-center mt-6">
-        <button
-          onClick={() => paginate(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <span className="px-4 py-2 mx-1">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => paginate(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+        {currentItems.length > 0 ? (
+          <div className="flex flex-wrap justify-center gap-10 mt-3">
+            {currentItems.map((artwork, index) => (
+              <div
+                key={index}
+                className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center"
+              >
+                {artwork && (
+                  <img
+                    src={artwork.primaryImage}
+                    alt={artwork.title}
+                    className="mb-4 w-90 h-70 rounded"
+                  />
+                )}
+                <h2 className="text-lg font-bold">{artwork.title} </h2>
+                <p className="text-md font-semibold">
+                  {artwork.artistNationality} - {artwork.accessionYear}
+                </p>
+                <p className="text-md text-black">
+                  {artwork.artistDisplayName || "Unknown Artist"}
+                </p>
+                {isArtworkSaved(artwork) ? (
+                  <button
+                    onClick={() => removeArtwork(artwork)}
+                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+                  >
+                    Remove from your Exhibition
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => saveArtwork(artwork)}
+                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                  >
+                    Save to your Exhibition
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          ""
+        )}
+
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="px-4 py-2 mx-1">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </main>
 
       <div className="mt-10 w-full">
         <h2 className="text-2xl font-bold mb-4 text-center">
@@ -300,13 +307,6 @@ function Met() {
         </div>
         {selectedExhibition && (
           <div>
-            <h3 className="text-xl font-bold mb-4">
-              {
-                exhibitions.find(
-                  (exhibition) => exhibition.id === selectedExhibition
-                )?.name
-              }
-            </h3>
             <div className="flex flex-wrap justify-center gap-10 mt-3">
               {exhibitions
                 .find((exhibition) => exhibition.id === selectedExhibition)

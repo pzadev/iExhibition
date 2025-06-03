@@ -18,7 +18,7 @@ function Bar() {
       <div className="flex gap-4 items-center">
         <button
           onClick={() => navigate("/exhibition")}
-          className={`text-lg font-semibold transition-colors px-4 py-2 rounded-full border-2 cursor-pointer
+          className={`text-lg font-semibold text-white hover:text-gray-300 transition-colors px-4 py-2 rounded-full border-2 cursor-pointer
     ${
       location.pathname === "/exhibition"
         ? "text-white"

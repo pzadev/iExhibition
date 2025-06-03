@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 type Source = "aic" | "met";
 
@@ -75,8 +76,6 @@ const Exhibition: React.FC = () => {
 
     setExhibitions(updatedExhibitions);
 
-   
-
     localStorage.setItem(
       "custom_exhibition",
       JSON.stringify(updatedExhibitions)
@@ -111,59 +110,62 @@ const Exhibition: React.FC = () => {
         <div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {selected.artworks.map((artwork) => (
-              <div
-                key={`${artwork.source}-${artwork.id}`}
-                className="bg-white rounded-lg shadow-md p-4 max-w-sm"
-              >
-                {artwork.source === "aic" && artwork.image_id ? (
-                  <img
-                    src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
-                    alt={artwork.title}
-                    className="w-full h-auto rounded mb-4"
-                  />
-                ) : artwork.source === "met" && artwork.primaryImage ? (
-                  <img
-                    src={artwork.primaryImage}
-                    alt={artwork.title}
-                    className="w-full h-auto rounded mb-4"
-                  />
-                ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
-                    <span className="text-gray-600">No Image Available</span>
-                  </div>
-                )}
-
-                <h2 className="text-xl font-semibold">{artwork.title}</h2>
-
-                <p className="text-gray-700">
-                  Artist:{" "}
-                  {artwork.artist_title ||
-                    artwork.artistDisplayName ||
-                    "Unknown Artist"}
-                </p>
-
-                <p className="text-gray-700 text-sm">
-                  Artist Origin:{" "}
-                  {artwork.place_of_origin || artwork.artistNationality || ""}
-                </p>
-
-                <p className="text-gray-500 text-sm">
-                  Year: {artwork.date_end || artwork.accessionYear || "Unknown"}
-                </p>
-
-                <p className="text-gray-500 text-sm">
-                  {artwork.source === "met"
-                    ? "Metropolitan Museum of Art"
-                    : "Chicago Art Institute"}
-                </p>
-
-                <button
-                  onClick={() => removeArtworkFromExhibition(artwork)}
-                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+              <Link to={`/artwork/${artwork.id}`} key={artwork.id}>
+                <div
+                  key={`${artwork.source}-${artwork.id}`}
+                  className="bg-white rounded-lg shadow-md p-4 max-w-sm"
                 >
-                  Remove from Exhibition
-                </button>
-              </div>
+                  {artwork.source === "aic" && artwork.image_id ? (
+                    <img
+                      src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
+                      alt={artwork.title}
+                      className="w-full h-auto rounded mb-4"
+                    />
+                  ) : artwork.source === "met" && artwork.primaryImage ? (
+                    <img
+                      src={artwork.primaryImage}
+                      alt={artwork.title}
+                      className="w-full h-auto rounded mb-4"
+                    />
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
+                      <span className="text-gray-600">No Image Available</span>
+                    </div>
+                  )}
+
+                  <h2 className="text-xl font-semibold">{artwork.title}</h2>
+
+                  <p className="text-gray-700">
+                    Artist:{" "}
+                    {artwork.artist_title ||
+                      artwork.artistDisplayName ||
+                      "Unknown Artist"}
+                  </p>
+
+                  <p className="text-gray-700 text-sm">
+                    Artist Origin:{" "}
+                    {artwork.place_of_origin || artwork.artistNationality || ""}
+                  </p>
+
+                  <p className="text-gray-500 text-sm">
+                    Year:{" "}
+                    {artwork.date_end || artwork.accessionYear || "Unknown"}
+                  </p>
+
+                  <p className="text-gray-500 text-sm">
+                    {artwork.source === "met"
+                      ? "Metropolitan Museum of Art"
+                      : "Chicago Art Institute"}
+                  </p>
+
+                  <button
+                    onClick={() => removeArtworkFromExhibition(artwork)}
+                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+                  >
+                    Remove from Exhibition
+                  </button>
+                </div>
+              </Link>
             ))}
           </div>
         </div>

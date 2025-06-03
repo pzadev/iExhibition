@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { fetchChicagoArtwork, fetchChicagoSearch } from "../api";
 import Lottie from "lottie-react";
 import exhibitionLoading from "../src/assets/ExhibitionLoading.json";
@@ -74,8 +75,8 @@ const Chicago: React.FC = () => {
       try {
         setIsLoading(true);
         const data = await fetchChicagoArtwork();
-        setChicagoArt(data.data);
-        setFilteredArt(data.data);
+        setChicagoArt(data);
+        setFilteredArt(data);
       } catch (error) {
         console.error("Error fetching artwork:", error);
       } finally {
@@ -129,7 +130,6 @@ const Chicago: React.FC = () => {
       return;
     }
 
-    console.log("Saving artwork:", artwork);
 
     const updatedExhibitions = exhibitions.map((exhibition) => {
       if (exhibition.id === selectedExhibition) {
@@ -187,17 +187,17 @@ const Chicago: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const response = await fetchChicagoSearch(searchQuery.trim());
+      const response = await fetchChicagoSearch(searchQuery);
 
       if (response) {
+        console.log("Search results:", response.data);
         const artworks: Artwork[] = response.data.map((item: any) => ({
           id: item.id,
           title: item.title,
           artist_title: item.artist_title,
-          date_end: item.date_end,
+          date_end: item.date_display,
           place_of_origin: item.place_of_origin,
           image_id: item.image_id,
-          year: item.accessionYear,
           source: "aic",
         }));
         setChicagoArt(artworks);
@@ -273,43 +273,55 @@ const Chicago: React.FC = () => {
       {currentItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {currentItems.map((artwork) => (
-            <div
-              key={artwork.id}
-              className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center"
-            >
-              {artwork.image_id ? (
-                <img
-                  src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
-                  alt={artwork.title}
-                  className="mb-4 w-90 h-70 rounded"
-                />
-              ) : (
-                <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
-                  <span className="text-gray-600">No Image Available</span>
-                </div>
-              )}
-              <h2 className="text-xl font-semibold">{artwork.title}</h2>
-              <p className="text-gray-700">
-                {artwork.artist_title || "Unknown Artist"}
-              </p>
-              <p className="text-gray-500 text-sm">{artwork.place_of_origin}</p>
-              <p className="text-gray-500 text-sm">Year: {artwork.date_end}</p>
-              {isArtworkSaved(artwork) ? (
-                <button
-                  onClick={() => removeArtwork(artwork)}
-                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
-                >
-                  Remove from your Exhibition
-                </button>
-              ) : (
-                <button
-                  onClick={() => saveArtwork(artwork)}
-                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-                >
-                  Save to your Exhibition
-                </button>
-              )}
-            </div>
+            <Link to={`/artwork/chicago/${artwork.id}`} key={artwork.id}>
+              <div
+                key={artwork.id}
+                className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center"
+              >
+                {artwork.image_id ? (
+                  <img
+                    src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
+                    alt={artwork.title}
+                    className="mb-4 w-90 h-70 rounded"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
+                    <span className="text-gray-600">No Image Available</span>
+                  </div>
+                )}
+                <h2 className="text-xl font-semibold">{artwork.title}</h2>
+                <p className="text-gray-700">
+                  {artwork.artist_title || "Unknown Artist"}
+                </p>
+                <p className="text-gray-500 text-sm">
+                  {artwork.place_of_origin}
+                </p>
+                <p className="text-gray-500 text-sm">
+                  Year: {artwork.date_end}
+                </p>
+                {isArtworkSaved(artwork) ? (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      removeArtwork(artwork);
+                    }}
+                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+                  >
+                    Remove from your Exhibition
+                  </button>
+                ) : (
+                  <button
+                   onClick={(e) => {
+                      e.preventDefault();
+                      saveArtwork(artwork);
+                    }}
+                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                  >
+                    Save to your Exhibition
+                  </button>
+                )}
+              </div>
+            </Link>
           ))}
         </div>
       ) : (

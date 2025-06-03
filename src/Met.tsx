@@ -3,6 +3,7 @@ import { fetchMetObjectById, fetchMetEuropeanArtIDs } from "../api";
 import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import exhibitionLoading from "../src/assets/ExhibitionLoading.json";
+import { Link } from "react-router-dom";
 
 function Met() {
   type Source = "aic" | "met";
@@ -13,6 +14,7 @@ function Met() {
     source: Source;
 
     artist_title?: string;
+    objectID?: number;
     date_end?: number;
     place_of_origin?: string;
     image_id?: string;
@@ -80,6 +82,7 @@ function Met() {
           (artwork) => artwork.primaryImage !== ""
         );
 
+        console.log(filtered)
         setMetArt(filtered);
         setFilteredArt(filtered);
       } catch (error) {
@@ -191,14 +194,12 @@ function Met() {
         <h1 className="font-medium text-center text-2xl mt-5 mb-4">
           Met Art Museum Exhibition
         </h1>
-
         <p className="text-lg text-gray-600 text-center mb-8 max-w-2xl">
           Discover the MET's rich art collection and curate your own exhibition
           by saving artworks to your personal collection. You can filter by
           artist and sort by year, making it easy to explore the museum's
           treasures.
         </p>
-
         <div className="flex flex-wrap gap-4 justify-center mb-6">
           <select
             value={selectedArtist}
@@ -221,50 +222,57 @@ function Met() {
             <option value="Oldest">Oldest First</option>
           </select>
         </div>
-
         {currentItems.length > 0 ? (
           <div className="flex flex-wrap justify-center gap-10 mt-3">
-            {currentItems.map((artwork, index) => (
-              <div
-                key={index}
-                className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center"
+            {currentItems.map((artwork) => (
+              <Link
+                key={artwork.objectID}
+                to={`/artwork/met/${artwork.objectID}`}
+                className="no-underline text-black"
               >
-                {artwork && (
-                  <img
-                    src={artwork.primaryImage}
-                    alt={artwork.title}
-                    className="mb-4 w-90 h-70 rounded"
-                  />
-                )}
-                <h2 className="text-lg font-bold">{artwork.title} </h2>
-                <p className="text-md font-semibold">
-                  {artwork.artistNationality} - {artwork.accessionYear}
-                </p>
-                <p className="text-md text-black">
-                  {artwork.artistDisplayName || "Unknown Artist"}
-                </p>
-                {isArtworkSaved(artwork) ? (
-                  <button
-                    onClick={() => removeArtwork(artwork)}
-                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
-                  >
-                    Remove from your Exhibition
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => saveArtwork(artwork)}
-                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-                  >
-                    Save to your Exhibition
-                  </button>
-                )}
-              </div>
+                <div className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center">
+                  {artwork && (
+                    <img
+                      src={artwork.primaryImage}
+                      alt={artwork.title}
+                      className="mb-4 w-90 h-70 rounded"
+                    />
+                  )}
+                  <h2 className="text-lg font-bold">{artwork.title} </h2>
+                  <p className="text-md font-semibold">
+                    {artwork.artistNationality} - {artwork.accessionYear}
+                  </p>
+                  <p className="text-md text-black">
+                    {artwork.artistDisplayName || "Unknown Artist"}
+                  </p>
+                  {isArtworkSaved(artwork) ? (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeArtwork(artwork);
+                      }}
+                      className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
+                    >
+                      Remove from your Exhibition
+                    </button>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        saveArtwork(artwork);
+                      }}
+                      className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                    >
+                      Save to your Exhibition
+                    </button>
+                  )}
+                </div>
+              </Link>
             ))}
           </div>
         ) : (
           ""
         )}
-
         <div className="flex justify-center mt-6">
           <button
             onClick={() => paginate(currentPage - 1)}

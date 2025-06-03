@@ -1,12 +1,14 @@
 import axios from "axios";
 
-const chicagoAPI = "https://api.artic.edu/api/v1/artworks?limit=100";
 
 export const fetchChicagoArtwork = async () => {
   try {
-    const response = await axios.get(chicagoAPI);
-    console.log(response.data);
-    return response.data;
+    const response = await axios.get("https://api.artic.edu/api/v1/artworks?limit=100");
+    const artworks = response.data.data;
+    const artworksWithImages = artworks.filter(
+      (artwork: any) => artwork.image_id && artwork.image_id.trim() !== ""
+    );
+    return artworksWithImages;
   } catch (error) {
     console.log(error);
   }
@@ -41,7 +43,8 @@ export const fetchChicagoSearch = async (artistName: string) => {
       {
         params: {
           q: artistName,
-          fields: "id,title,image_id,artist_title, date_display, accessionYear",
+          fields:
+            "id,title,image_id,artist_title, date_display, place_of_origin",
           limit: 25,
         },
       }
@@ -50,5 +53,27 @@ export const fetchChicagoSearch = async (artistName: string) => {
   } catch (error) {
     console.error("Error fetching artist search results:", error);
     return null;
+  }
+};
+
+export const fetchChicagoSingle = async (artworkId: string) => {
+  try {
+    const response = await axios.get(
+      `https://api.artic.edu/api/v1/artworks/${artworkId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch artwork details:", error);
+  }
+};
+
+export const fetchMetSingle = async (artworkId: string) => {
+  try {
+    const response = await axios.get(
+      `https://collectionapi.metmuseum.org/public/collection/v1/objects/${artworkId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch Met artwork details:", error);
   }
 };

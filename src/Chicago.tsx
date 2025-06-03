@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchChicagoArtwork } from "../api";
+import { fetchChicagoArtwork, fetchChicagoSearch } from "../api";
 import Lottie from "lottie-react";
 import exhibitionLoading from "../src/assets/ExhibitionLoading.json";
 
@@ -39,6 +39,7 @@ const Chicago: React.FC = () => {
     null
   );
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     const storedExhibitions = localStorage.getItem("custom_exhibition");
@@ -181,6 +182,38 @@ const Chicago: React.FC = () => {
     return exhibition?.artworks.some((item) => item.id === artwork.id) || false;
   };
 
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    try {
+      setIsLoading(true);
+      const response = await fetchChicagoSearch(searchQuery.trim());
+
+      if (response) {
+        const artworks: Artwork[] = response.data.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          artist_title: item.artist_title,
+          date_end: item.date_end,
+          place_of_origin: item.place_of_origin,
+          image_id: item.image_id,
+          year: item.accessionYear,
+          source: "aic",
+        }));
+        setChicagoArt(artworks);
+        setFilteredArt(artworks);
+        setSelectedArtist("All");
+        setCurrentPage(1);
+      } else {
+        console.error("No results found for the search query.");
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return isLoading ? (
     <div className="flex flex-col justify-center items-center h-130">
       <Lottie
@@ -205,6 +238,16 @@ const Chicago: React.FC = () => {
       </p>
 
       <div className="flex flex-wrap gap-4 justify-center mb-6">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSearch();
+          }}
+          placeholder="Search for artworks or artists..."
+          className="p-2 border border-gray-400 rounded w-80"
+        />
         <select
           value={selectedArtist}
           onChange={(e) => setSelectedArtist(e.target.value)}

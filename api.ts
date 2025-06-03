@@ -33,3 +33,22 @@ export const fetchMetObjectById = async (id: number) => {
     console.log(error);
   }
 };
+
+export const fetchChicagoSearch = async (artistName: string) => {
+  try {
+    const response = await axios.get(
+      `https://api.artic.edu/api/v1/artworks/search`,
+      {
+        params: {
+          q: artistName,
+          fields: "id,title,image_id,artist_title, date_display, accessionYear",
+          limit: 25,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching artist search results:", error);
+    return null;
+  }
+};

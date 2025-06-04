@@ -1,5 +1,9 @@
 import "./App.css";
-import { fetchMetObjectById, fetchMetEuropeanArtIDs } from "../api";
+import {
+  fetchMetObjectById,
+  fetchMetEuropeanArtIDs,
+  fetchMetSearch,
+} from "../api";
 import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import exhibitionLoading from "../src/assets/ExhibitionLoading.json";
@@ -42,6 +46,7 @@ function Met() {
     null
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     const storedExhibitions = localStorage.getItem("custom_exhibition");
@@ -82,7 +87,6 @@ function Met() {
           (artwork) => artwork.primaryImage !== ""
         );
 
-        console.log(filtered)
         setMetArt(filtered);
         setFilteredArt(filtered);
       } catch (error) {
@@ -119,7 +123,7 @@ function Met() {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredArt.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredArt.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredArt.length / itemsPerPage));
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -176,6 +180,33 @@ function Met() {
     );
   };
 
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) return;
+    setIsLoading(true);
+    try {
+      const ids = await fetchMetSearch(searchTerm.trim());
+
+      if (ids && ids.length) {
+        const objectPromises = ids.slice(0, 50).map(fetchMetObjectById);
+        const artworks = await Promise.all(objectPromises);
+        const filtered = artworks.filter(
+          (art) => art && art.primaryImage !== ""
+        );
+
+        setMetArt(filtered);
+        setFilteredArt(filtered);
+        setSelectedArtist("All");
+      } else {
+        setMetArt([]);
+        setFilteredArt([]);
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return isLoading ? (
     <div className="flex flex-col justify-center items-center h-130">
       <Lottie
@@ -196,11 +227,31 @@ function Met() {
         </h1>
         <p className="text-lg text-gray-600 text-center mb-8 max-w-2xl">
           Discover the MET's rich art collection and curate your own exhibition
-          by saving artworks to your personal collection. You can filter by
-          artist and sort by year, making it easy to explore the museum's
-          treasures.
+          by saving artworks to your personal collection. You can filter by art
+          piece name, artist and sort by date, making it easy to explore the
+          exhibitions's treasures.
         </p>
         <div className="flex flex-wrap gap-4 justify-center mb-6">
+          <input
+            type="text"
+            placeholder="Search by piece name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
+            className="p-2 border border-gray-400 rounded w-64"
+          />
+
+          <button
+            onClick={handleSearch}
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            Search
+          </button>
+
           <select
             value={selectedArtist}
             onChange={(e) => setSelectedArtist(e.target.value)}
@@ -222,7 +273,12 @@ function Met() {
             <option value="Oldest">Oldest First</option>
           </select>
         </div>
-        {currentItems.length > 0 ? (
+
+        {filteredArt.length === 0 ? (
+          <p className="text-center text-xl text-gray-500 mt-8">
+            No results found. Try another search term.
+          </p>
+        ) : (
           <div className="flex flex-wrap justify-center gap-10 mt-3">
             {currentItems.map((artwork) => (
               <Link
@@ -238,9 +294,14 @@ function Met() {
                       className="mb-4 w-90 h-70 rounded"
                     />
                   )}
-                  <h2 className="text-lg font-bold">{artwork.title} </h2>
+                  <h2 className="text-lg font-bold">
+                    {artwork.title.length > 25
+                      ? artwork.title.slice(0, 25) + "..."
+                      : artwork.title}
+                  </h2>
                   <p className="text-md font-semibold">
-                    {artwork.artistNationality} - {artwork.accessionYear}
+                    {artwork.artistNationality || "Unknown Nationality"} -{" "}
+                    {artwork.accessionYear}
                   </p>
                   <p className="text-md text-black">
                     {artwork.artistDisplayName || "Unknown Artist"}
@@ -270,9 +331,8 @@ function Met() {
               </Link>
             ))}
           </div>
-        ) : (
-          ""
         )}
+
         <div className="flex justify-center mt-6">
           <button
             onClick={() => paginate(currentPage - 1)}
@@ -298,7 +358,7 @@ function Met() {
         <h2 className="text-2xl font-bold mb-4 text-center">
           Your Exhibitions
         </h2>
-        <div className="flex flex-wrap gap-4 mb-4 justify-center">
+        {/* <div className="flex flex-wrap gap-4 mb-4 justify-center">
           {exhibitions.map((exhibition) => (
             <button
               key={exhibition.id}
@@ -312,7 +372,7 @@ function Met() {
               {exhibition.name}
             </button>
           ))}
-        </div>
+        </div> */}
         {selectedExhibition && (
           <div>
             <div className="flex flex-wrap justify-center gap-10 mt-3">
@@ -347,7 +407,7 @@ function Met() {
                     <p className="text-md font-semibold">
                       {artwork.place_of_origin ||
                         artwork.artistNationality ||
-                        ""}
+                        "Unknown Origin"}
                     </p>
                     <p className="text-gray-700">
                       Artist:{" "}

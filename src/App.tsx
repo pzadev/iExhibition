@@ -17,8 +17,7 @@ function App() {
           <Route path="/chicago" element={<Chicago />} />
           <Route path="/met" element={<Met />} />
           <Route path="/exhibition" element={<Exhibition />} />
-          <Route path="/artwork/:source/:id" element={<SingleArtwork />} />
-        </Routes>
+          <Route path="/artwork/:source/:id" element={<SingleArtwork />} />        </Routes>
       </div>
       <Footer />
     </div>

@@ -120,16 +120,14 @@ const Chicago: React.FC = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredArt.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredArt.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredArt.length / itemsPerPage));
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const saveArtwork = (artwork: Artwork) => {
     if (selectedExhibition === null) {
-      console.log("No exhibition selected");
       return;
     }
-
 
     const updatedExhibitions = exhibitions.map((exhibition) => {
       if (exhibition.id === selectedExhibition) {
@@ -190,7 +188,6 @@ const Chicago: React.FC = () => {
       const response = await fetchChicagoSearch(searchQuery);
 
       if (response) {
-        console.log("Search results:", response.data);
         const artworks: Artwork[] = response.data.map((item: any) => ({
           id: item.id,
           title: item.title,
@@ -248,6 +245,13 @@ const Chicago: React.FC = () => {
           placeholder="Search for artworks or artists..."
           className="p-2 border border-gray-400 rounded w-80"
         />
+        <button
+          onClick={handleSearch}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Search
+        </button>
+
         <select
           value={selectedArtist}
           onChange={(e) => setSelectedArtist(e.target.value)}
@@ -270,6 +274,7 @@ const Chicago: React.FC = () => {
         </select>
       </div>
 
+
       {currentItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {currentItems.map((artwork) => (
@@ -289,7 +294,11 @@ const Chicago: React.FC = () => {
                     <span className="text-gray-600">No Image Available</span>
                   </div>
                 )}
-                <h2 className="text-xl font-semibold">{artwork.title}</h2>
+                <h2 className="text-xl font-semibold">
+                  {artwork.title.length > 25
+                    ? artwork.title.slice(0, 25)
+                    : artwork.title}
+                </h2>
                 <p className="text-gray-700">
                   {artwork.artist_title || "Unknown Artist"}
                 </p>
@@ -311,7 +320,7 @@ const Chicago: React.FC = () => {
                   </button>
                 ) : (
                   <button
-                   onClick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       saveArtwork(artwork);
                     }}
@@ -321,11 +330,18 @@ const Chicago: React.FC = () => {
                   </button>
                 )}
               </div>
+              
             </Link>
+            
           ))}
+          
         </div>
+        
+        
       ) : (
-        ""
+        <p className="text-center text-xl text-gray-500 mt-4">
+            No results found. Try another search term.
+          </p>
       )}
 
       <div className="flex justify-center mt-6">
@@ -353,7 +369,7 @@ const Chicago: React.FC = () => {
           Your Exhibitions
         </h2>
 
-        <div className="flex flex-wrap gap-4 mb-4 justify-center text-center">
+        {/* <div className="flex flex-wrap gap-4 mb-4 justify-center text-center">
           {exhibitions.map((exhibition) => (
             <button
               key={exhibition.id}
@@ -367,7 +383,7 @@ const Chicago: React.FC = () => {
               {exhibition.name}
             </button>
           ))}
-        </div>
+        </div> */}
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">

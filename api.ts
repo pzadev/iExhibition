@@ -1,9 +1,10 @@
 import axios from "axios";
 
-
 export const fetchChicagoArtwork = async () => {
   try {
-    const response = await axios.get("https://api.artic.edu/api/v1/artworks?limit=100");
+    const response = await axios.get(
+      "https://api.artic.edu/api/v1/artworks?limit=100"
+    );
     const artworks = response.data.data;
     const artworksWithImages = artworks.filter(
       (artwork: any) => artwork.image_id && artwork.image_id.trim() !== ""
@@ -19,6 +20,7 @@ export const fetchMetEuropeanArtIDs = async () => {
     const response = await axios.get(
       "https://collectionapi.metmuseum.org/public/collection/v1/search?q=European&medium=Paintings&hasImages=true"
     );
+
     return response.data.objectIDs;
   } catch (error) {
     console.log(error);
@@ -30,6 +32,8 @@ export const fetchMetObjectById = async (id: number) => {
     const response = await axios.get(
       `https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`
     );
+      console.log(response.data, "data");
+
     return response.data;
   } catch (error) {
     console.log(error);
@@ -53,6 +57,25 @@ export const fetchChicagoSearch = async (artistName: string) => {
   } catch (error) {
     console.error("Error fetching artist search results:", error);
     return null;
+  }
+};
+
+export const fetchMetSearch = async (searchTerm: string) => {
+  try {
+    const response = await axios.get(
+      `https://collectionapi.metmuseum.org/public/collection/v1/search`,
+      { params: { q: searchTerm } }
+    );
+
+    if (!response.data.objectIDs || response.data.objectIDs.length === 0) {
+      console.warn("No artworks found for the search term:", searchTerm);
+      return [];
+    }
+
+    return response.data.objectIDs || [];
+  } catch (error) {
+    console.error("Error fetching Met search results:", error);
+    return [];
   }
 };
 

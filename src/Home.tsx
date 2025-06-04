@@ -5,7 +5,7 @@ function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center px-4 py-6">
+    <div className="flex flex-col items-center px-3 py-5">
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         Welcome to iExhibition
       </h1>
@@ -23,7 +23,7 @@ function Home() {
           <img
             src="https://media.timeout.com/images/102850781/image.jpg"
             alt="Art Institute of Chicago"
-            className="mb-4 h-[300px] w-full object-cover rounded"
+            className="mb-4 h-[300px] w-[full] object-cover rounded"
           />
           <h2 className="text-xl font-bold">Art Institute of Chicago</h2>
           <p className="text-md text-black font-semibold">Chicago, IL</p>
@@ -49,7 +49,7 @@ function Home() {
       >
         Create or View your own Exhibitions
       </button>
-      <div className="w-screen bg-gray-500 flex justify-center py-6 mt-12">
+      <div className="w-screen bg-gray-500 flex justify-center py-6 mt-12 mb-25">
         <div className="flex flex-col md:flex-row items-center gap-8 p-6 rounded-lg w-full max-w-6xl">
           <div className="flex-1 text-white">
             <h2 className="text-2xl font-bold mb-2 text-center ">

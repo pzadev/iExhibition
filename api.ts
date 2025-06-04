@@ -32,7 +32,6 @@ export const fetchMetObjectById = async (id: number) => {
     const response = await axios.get(
       `https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`
     );
-      console.log(response.data, "data");
 
     return response.data;
   } catch (error) {

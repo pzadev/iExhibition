@@ -101,7 +101,6 @@ const Exhibition: React.FC = () => {
     if (exhibitionRaw) {
       try {
         const stored: Exhibition[] = JSON.parse(exhibitionRaw);
-        console.log("Loaded exhibitions from localStorage:", stored);
         setExhibitions(stored);
         setSelectedExhibition(stored[0]?.id || null);
       } catch (err) {

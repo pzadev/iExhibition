@@ -16,8 +16,8 @@ View artworks from both The Met and the Art Institute of Chicago.
 ### 🎨 Search and Filter  
 Quickly find specific works using keyword search and filter options like artist or artwork name.
 
-### 🧩 Build a Custom Exhibition  
-Add your favourite pieces to a personal local exhibition page.
+### 🧩 Build a Custom Collection  
+Add your favourite pieces to a personal local collection page.
 
 ### 🔗 Share Your Exhibition  
 Every exhibition has a unique link you can share with friends or family!

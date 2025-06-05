@@ -164,14 +164,14 @@ const SingleArtwork = () => {
               onClick={handleRemove}
               className="px-6 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-600 transition"
             >
-              Remove from Exhibition
+              Remove from Collection
             </button>
           ) : (
             <button
               onClick={handleSave}
               className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
             >
-              Save to Exhibition
+              Save to Collection
             </button>
           )}
         </div>

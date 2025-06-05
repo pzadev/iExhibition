@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 type Source = "aic" | "met";
 
@@ -189,7 +189,12 @@ const Exhibition: React.FC = () => {
         </div>
       )}
 
-      <h2 className="text-xl font-semibold">{artwork.title}</h2>
+      <h2 className="text-xl font-semibold">
+        {" "}
+        {artwork.title.length > 30
+          ? artwork.title.slice(0, 30) + "..."
+          : artwork.title}
+      </h2>
 
       <p className="text-gray-700">
         Artist:{" "}
@@ -205,7 +210,6 @@ const Exhibition: React.FC = () => {
 
       <p className="text-gray-500 text-sm">
         Year: {artwork.date_end || artwork.accessionYear || "Unknown"}
-   
       </p>
 
       <p className="text-gray-500 text-sm">

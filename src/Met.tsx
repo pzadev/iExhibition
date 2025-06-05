@@ -228,8 +228,8 @@ function Met() {
         <p className="text-lg text-gray-600 text-center mb-8 max-w-2xl">
           Discover the MET's rich art collection and curate your own exhibition
           by saving artworks to your personal collection. You can filter by art
-          piece name, artist and sort by date, making it easy to explore the
-          exhibitions's treasures.
+          piece name, artist and sort by date or click on the artwork to view
+          more details!
         </p>
         <div className="flex flex-wrap gap-4 justify-center mb-6">
           <input
@@ -403,7 +403,12 @@ function Met() {
                       </div>
                     )}
 
-                    <h2 className="text-lg font-bold">{artwork.title}</h2>
+                    <h2 className="text-lg font-bold">
+                      {" "}
+                      {artwork.title.length > 30
+                        ? artwork.title.slice(0, 30) + "..."
+                        : artwork.title}
+                    </h2>
                     <p className="text-md font-semibold">
                       {artwork.place_of_origin ||
                         artwork.artistNationality ||

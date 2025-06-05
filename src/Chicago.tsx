@@ -231,7 +231,7 @@ const Chicago: React.FC = () => {
       <p className="text-lg text-gray-600 text-center mb-8 max-w-2xl">
         Discover Chicago's rich art collection and curate your own exhibition by
         saving artworks to your personal collection. You can filter by artist
-        and sort by year, making it easy to explore the museum's treasures.
+        and sort by year or click on an artwork to view more details!
       </p>
 
       <div className="flex flex-wrap gap-4 justify-center mb-6">
@@ -424,7 +424,9 @@ const Chicago: React.FC = () => {
                       </div>
                     )}
 
-                    <h2 className="text-lg font-bold">{artwork.title}</h2>
+                    <h2 className="text-lg font-bold"> {artwork.title.length > 30
+                    ? artwork.title.slice(0, 30) + "..."
+                    : artwork.title}</h2>
                     <p className="text-md font-semibold">
                       {artwork.place_of_origin ||
                         artwork.artistNationality ||

@@ -227,7 +227,7 @@ const Exhibition: React.FC = () => {
           }}
           className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
         >
-          Remove from Exhibition
+          Remove from Collection
         </button>
       )}
     </div>
@@ -238,9 +238,9 @@ const Exhibition: React.FC = () => {
       <h1 className="text-3xl font-bold mb-6 text-center">
         {sharedArtworks
           ? loadingSharedArtworks
-            ? "Loading Shared Exhibition..."
-            : "Shared Exhibition"
-          : "Your Exhibition"}
+            ? "Loading Shared Collection..."
+            : "Shared Collection"
+          : "Your Collection"}
       </h1>
 
       {!sharedArtworks && (
@@ -265,7 +265,7 @@ const Exhibition: React.FC = () => {
             onClick={shareExhibition}
             className="mb-6 px-4 py-2 bg-green-600 text-white rounded"
           >
-            Share This Exhibition
+            Share This Collection
           </button>
         </>
       )}

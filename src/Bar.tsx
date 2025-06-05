@@ -34,7 +34,7 @@ function Bar() {
     }
   `}
         >
-          Your Exhibitions
+          Your Collection
         </button>
       </div>
     </header>

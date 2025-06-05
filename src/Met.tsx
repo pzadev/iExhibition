@@ -87,6 +87,8 @@ function Met() {
           (artwork) => artwork.primaryImage !== ""
         );
 
+        console.log(filtered)
+
         setMetArt(filtered);
         setFilteredArt(filtered);
       } catch (error) {
@@ -314,7 +316,7 @@ function Met() {
                       }}
                       className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
                     >
-                      Remove from your Exhibition
+                      Remove from your Collection
                     </button>
                   ) : (
                     <button
@@ -324,7 +326,7 @@ function Met() {
                       }}
                       className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
                     >
-                      Save to your Exhibition
+                      Save to your Collection
                     </button>
                   )}
                 </div>
@@ -356,7 +358,7 @@ function Met() {
 
       <div className="mt-10 w-full">
         <h2 className="text-2xl font-bold mb-4 text-center">
-          Your Exhibitions
+          Your Collection
         </h2>
         {/* <div className="flex flex-wrap gap-4 mb-4 justify-center">
           {exhibitions.map((exhibition) => (
@@ -435,7 +437,7 @@ function Met() {
                       onClick={() => removeArtwork(artwork)}
                       className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
                     >
-                      Remove from your Exhibition
+                      Remove from your Collection
                     </button>
                   </div>
                 ))}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchChicagoArtwork, fetchChicagoSearch } from "../api";
 import Lottie from "lottie-react";
-import exhibitionLoading from "../src/assets/ExhibitionLoading.json";
+import exhibitionLoading from "./assets/exhibitionLoading.json"
 
 type Source = "aic" | "met";
 

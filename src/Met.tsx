@@ -6,7 +6,7 @@ import {
 } from "../api";
 import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
-import exhibitionLoading from "../src/assets/ExhibitionLoading.json";
+import exhibitionLoading from "./assets/exhibitionLoading.json";
 import { Link } from "react-router-dom";
 
 function Met() {

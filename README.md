@@ -1,54 +1,59 @@
-# React + TypeScript + Vite
+# 🖼️ iExhibition
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Deployed and accessible at [iExhibiton](https://iexhibition.netlify.app/)
 
-Currently, two official plugins are available:
+## What is iExhibition?
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**iExhibition** brings together artworks from The Metropolitan Museum of Art and the Art Institute of Chicago, giving users a simple and engaging way to explore both collections in one place. Whether you're a student, a researcher, or just someone who enjoys art, you can search for pieces, learn more about them, and create your own virtual exhibitions to share with others.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Key Features
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 🔍 Browse by Collection  
+View artworks from both The Met and the Art Institute of Chicago.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 🎨 Search and Filter  
+Quickly find specific works using keyword search and filter options like artist or artwork name.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 🧩 Build a Custom Exhibition  
+Add your favourite pieces to a personal local exhibition page.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+### 🔗 Share Your Exhibition  
+Every exhibition has a unique link you can share with friends or family!
+
+### 📱 Mobile Friendly  
+The site works across desktop and mobile.
+
+---
+
+## Running the Project Locally
+
+Follow these steps to run the project on your machine:
+
+### 1. Requirements
+
+Make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (v16 or later)  
+- npm (comes bundled with Node.js)
+
+### 2. Clone the Repository
+- git clone https://github.com/your-username/iexhibition.git
+- cd iMuseum
+
+### 3. Install Dependencies
+- npm install
+
+### 4. Start the Development Server
+- npm run dev
+- click the localhost link that appears
+
+## Tech Stack
+
+- **React ** – Frontend for building the user interface   
+- **Vite** – Development build tool and bundler
+- **Tailwind CSS** – CSS framework for styling  
+- **Axios** – For making API requests to the museum collections  
+
+

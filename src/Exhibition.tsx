@@ -175,13 +175,13 @@ const Exhibition: React.FC = () => {
         <img
           src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
           alt={artwork.title}
-          className="w-full h-auto rounded mb-4"
+          className="mb-4 w-80 h-80 rounded object-contain"
         />
       ) : artwork.source === "met" && artwork.primaryImage ? (
         <img
           src={artwork.primaryImage}
           alt={artwork.title}
-          className="w-full h-auto rounded mb-4"
+          className="mb-4 w-100 h-100 rounded object-contain"
         />
       ) : (
         <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
@@ -245,22 +245,6 @@ const Exhibition: React.FC = () => {
 
       {!sharedArtworks && (
         <>
-          {/* <div className="flex flex-wrap gap-4 mb-4">
-            {exhibitions.map((exhibition) => (
-              <button
-                key={exhibition.id}
-                onClick={() => setSelectedExhibition(exhibition.id)}
-                className={`px-4 py-2 rounded ${
-                  selectedExhibition === exhibition.id
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200"
-                }`}
-              >
-                {exhibition.name}
-              </button>
-            ))}
-          </div> */}
-
           <button
             onClick={shareExhibition}
             className="mb-6 px-4 py-2 bg-green-600 text-white rounded"

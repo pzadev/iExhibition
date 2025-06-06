@@ -362,21 +362,7 @@ function Met() {
 
       <div className="mt-10 w-full">
         <h2 className="text-2xl font-bold mb-4 text-center">Your Collection</h2>
-        {/* <div className="flex flex-wrap gap-4 mb-4 justify-center">
-          {exhibitions.map((exhibition) => (
-            <button
-              key={exhibition.id}
-              onClick={() => setSelectedExhibition(exhibition.id)}
-              className={`px-4 py-2 rounded ${
-                selectedExhibition === exhibition.id
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200"
-              }`}
-            >
-              {exhibition.name}
-            </button>
-          ))}
-        </div> */}
+
         {selectedExhibition && (
           <div>
             <div className="flex flex-wrap justify-center gap-10 mt-3">

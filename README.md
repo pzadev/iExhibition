@@ -1,6 +1,6 @@
 # 🖼️ iExhibition
 
-Deployed and accessible at [iExhibiton](https://iexhibition.netlify.app/)
+Deployed and accessible at [iExhibition](https://iexhibition.netlify.app/)
 
 ## What is iExhibition?
 

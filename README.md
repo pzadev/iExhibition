@@ -4,11 +4,11 @@ Deployed and accessible at [iExhibiton](https://iexhibition.netlify.app/)
 
 ## What is iExhibition?
 
-**iExhibition** brings together artworks from The Metropolitan Museum of Art and the Art Institute of Chicago, giving users a simple and engaging way to explore both collections in one place. Whether you're a student, a researcher, or just someone who enjoys art, you can search for pieces, learn more about them, and create your own virtual exhibitions to share with others.
+**iExhibition** brings together artworks from The Metropolitan Museum of Art and the Art Institute of Chicago, giving users a simple and engaging way to explore both collections in one place. Whether you're a student, a researcher, or just someone who enjoys art, you can search for pieces, learn more about them, and create your own virtual collection to share with others via a unique url.
 
 ---
 
-## Key Features
+## Key Features of iExhibition
 
 ### 🔍 Browse by Collection  
 View artworks from both The Met and the Art Institute of Chicago.
@@ -40,7 +40,7 @@ Make sure you have the following installed:
 
 ### 2. Clone the Repository
 - git clone https://github.com/your-username/iexhibition.git
-- cd iMuseum
+- cd iExhibition
 
 ### 3. Install Dependencies
 - npm install

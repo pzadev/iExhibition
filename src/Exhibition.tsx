@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import noImageDisplay from "./assets/NoImageAvailableDisplay.jpg";
 
 type Source = "aic" | "met";
 
@@ -175,18 +176,26 @@ const Exhibition: React.FC = () => {
         <img
           src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
           alt={artwork.title}
-          className="mb-4 w-80 h-80 rounded object-contain"
+          className="mb-4 w-60 h-60 rounded object-contain"
+          onError={(e) => {
+            e.currentTarget.src = noImageDisplay;
+          }}
         />
       ) : artwork.source === "met" && artwork.primaryImage ? (
         <img
           src={artwork.primaryImage}
           alt={artwork.title}
-          className="mb-4 w-100 h-100 rounded object-contain"
+          className="mb-4 w-60 h-60 rounded object-contain"
+          onError={(e) => {
+            e.currentTarget.src = noImageDisplay;
+          }}
         />
       ) : (
-        <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
-          <span className="text-gray-600">No Image Available</span>
-        </div>
+        <img
+          src={noImageDisplay}
+          alt="No image available"
+          className="mb-4 w-60 h-60 rounded object-contain"
+        />
       )}
 
       <h2 className="text-xl font-semibold">

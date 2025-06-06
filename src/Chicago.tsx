@@ -366,8 +366,6 @@ const Chicago: React.FC = () => {
       <div className="mt-10 w-full">
         <h2 className="text-2xl font-bold mb-4 text-center">Your Collection</h2>
 
-       
-
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <Lottie
@@ -391,22 +389,28 @@ const Chicago: React.FC = () => {
                       <img
                         src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
                         alt={artwork.title}
-                        className="mb-4 w-60 h-60 rounded"
+                        className="mb-4 w-60 h-60 rounded object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = noImageDisplay;
+                        }}
                       />
                     ) : artwork.source === "met" && artwork.primaryImage ? (
                       <img
                         src={artwork.primaryImage}
                         alt={artwork.title}
-                        className="mb-4 w-60 h-60 rounded"
+                        className="mb-4 w-60 h-60 rounded object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = noImageDisplay;
+                        }}
                       />
                     ) : (
-                      <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
-                        <span className="text-gray-600">
-                          No Image Available
-                        </span>
-                      </div>
+                      <img
+                        src={noImageDisplay}
+                        alt="No image available"
+                        className="mb-4 w-60 h-60 rounded object-contain"
+                      />
                     )}
-
+                    
                     <h2 className="text-lg font-bold">
                       {" "}
                       {artwork.title.length > 30

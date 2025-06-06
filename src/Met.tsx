@@ -77,7 +77,7 @@ function Met() {
       try {
         setIsLoading(true);
         const ids = await fetchMetEuropeanArtIDs();
-        const sliced = ids.slice(0, 500);
+        const sliced = ids.slice(0, 200);
 
         const objectPromises = sliced.map((id: number) =>
           fetchMetObjectById(id)

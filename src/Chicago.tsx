@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchChicagoArtwork, fetchChicagoSearch } from "../api";
 import Lottie from "lottie-react";
-import exhibitionLoading from "./assets/exhibitionLoading.json"
+import exhibitionLoading from "./assets/exhibitionLoading.json";
+import noImageDisplay from "./assets/NoImageAvailableDisplay.jpg";
 
 type Source = "aic" | "met";
 
@@ -274,7 +275,6 @@ const Chicago: React.FC = () => {
         </select>
       </div>
 
-
       {currentItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {currentItems.map((artwork) => (
@@ -283,17 +283,21 @@ const Chicago: React.FC = () => {
                 key={artwork.id}
                 className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center"
               >
-                {artwork.image_id ? (
-                  <img
-                    src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
-                    alt={artwork.title}
-                    className="mb-4 w-90 h-70 rounded"
-                  />
-                ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
-                    <span className="text-gray-600">No Image Available</span>
-                  </div>
-                )}
+                <img
+                  src={
+                    artwork.image_id
+                      ? `https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`
+                      : noImageDisplay
+                  }
+                  alt={artwork.title || "No image available"}
+                  className="mb-4 w-90 h-70 rounded object-contain bg-gray-100"
+                  onError={(e) => {
+                    if (e.currentTarget.src !== noImageDisplay) {
+                      e.currentTarget.src = noImageDisplay;
+                    }
+                  }}
+                />
+
                 <h2 className="text-xl font-semibold">
                   {artwork.title.length > 25
                     ? artwork.title.slice(0, 25)
@@ -330,18 +334,13 @@ const Chicago: React.FC = () => {
                   </button>
                 )}
               </div>
-              
             </Link>
-            
           ))}
-          
         </div>
-        
-        
       ) : (
         <p className="text-center text-xl text-gray-500 mt-4">
-            No results found. Try another search term.
-          </p>
+          No results found. Try another search term.
+        </p>
       )}
 
       <div className="flex justify-center mt-6">
@@ -365,9 +364,7 @@ const Chicago: React.FC = () => {
       </div>
 
       <div className="mt-10 w-full">
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          Your Collection
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Your Collection</h2>
 
         {/* <div className="flex flex-wrap gap-4 mb-4 justify-center text-center">
           {exhibitions.map((exhibition) => (
@@ -424,9 +421,12 @@ const Chicago: React.FC = () => {
                       </div>
                     )}
 
-                    <h2 className="text-lg font-bold"> {artwork.title.length > 30
-                    ? artwork.title.slice(0, 30) + "..."
-                    : artwork.title}</h2>
+                    <h2 className="text-lg font-bold">
+                      {" "}
+                      {artwork.title.length > 30
+                        ? artwork.title.slice(0, 30) + "..."
+                        : artwork.title}
+                    </h2>
                     <p className="text-md font-semibold">
                       {artwork.place_of_origin ||
                         artwork.artistNationality ||

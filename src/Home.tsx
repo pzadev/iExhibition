@@ -18,7 +18,7 @@ function Home() {
       <div className="flex flex-wrap gap-10 justify-center mb-12">
         <div
           onClick={() => navigate("/chicago")}
-          className="cursor-pointer bg-green-500 w-[400px] p-6 rounded-lg shadow-md flex flex-col items-center text-center transition-transform hover:scale-105"
+          className="cursor-pointer bg-yellow-500 w-[400px] p-6 rounded-lg shadow-md flex flex-col items-center text-center transition-transform hover:scale-105"
         >
           <img
             src="https://media.timeout.com/images/102850781/image.jpg"
@@ -31,7 +31,7 @@ function Home() {
 
         <div
           onClick={() => navigate("/met")}
-          className="cursor-pointer bg-red-400 w-[400px] p-6 rounded-lg shadow-md flex flex-col items-center text-center transition-transform hover:scale-105"
+          className="cursor-pointer bg-blue-400 w-[400px] p-6 rounded-lg shadow-md flex flex-col items-center text-center transition-transform hover:scale-105"
         >
           <img
             src="https://cdn.sanity.io/images/cctd4ker/production/c47d68fbeb2ac1df1c97065fc4c9576314114ac2-2100x1150.jpg?rect=539,36,1011,1074&w=3840&q=75&fit=clip&auto=format"
@@ -49,7 +49,7 @@ function Home() {
       >
         Create or View your own Exhibitions
       </button>
-      <div className="w-screen bg-gray-500 flex justify-center py-6 mt-12 mb-25">
+      <div className="w-screen bg-gray-500 flex justify-center py-6 mt-12">
         <div className="flex flex-col md:flex-row items-center gap-8 p-6 rounded-lg w-full max-w-6xl">
           <div className="flex-1 text-white">
             <h2 className="text-2xl font-bold mb-2 text-center ">

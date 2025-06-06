@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import exhibitionLoading from "./assets/exhibitionLoading.json";
 import { Link } from "react-router-dom";
+import noImageDisplay from "./assets/NoImageAvailableDisplay.jpg";
 
 function Met() {
   type Source = "aic" | "met";
@@ -76,7 +77,7 @@ function Met() {
       try {
         setIsLoading(true);
         const ids = await fetchMetEuropeanArtIDs();
-        const sliced = ids.slice(0, 50);
+        const sliced = ids.slice(0, 500);
 
         const objectPromises = sliced.map((id: number) =>
           fetchMetObjectById(id)
@@ -86,8 +87,6 @@ function Met() {
         const filtered = artworks.filter(
           (artwork) => artwork.primaryImage !== ""
         );
-
-        console.log(filtered)
 
         setMetArt(filtered);
         setFilteredArt(filtered);
@@ -230,13 +229,12 @@ function Met() {
         <p className="text-lg text-gray-600 text-center mb-8 max-w-2xl">
           Discover the MET's rich art collection and curate your own exhibition
           by saving artworks to your personal collection. You can filter by art
-          piece name, artist and sort by date or click on the artwork to view
-          more details!
+          piece name, artist, date or click on the artwork to view more details!
         </p>
         <div className="flex flex-wrap gap-4 justify-center mb-6">
           <input
             type="text"
-            placeholder="Search by piece name"
+            placeholder="Filter by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => {
@@ -291,11 +289,17 @@ function Met() {
                 <div className="bg-gray-200 w-80 h-130 p-6 rounded-lg shadow-md flex flex-col items-center text-center">
                   {artwork && (
                     <img
-                      src={artwork.primaryImage}
-                      alt={artwork.title}
-                      className="mb-4 w-90 h-70 rounded"
+                      src={artwork.primaryImage || noImageDisplay}
+                      alt={artwork.title || "No image available"}
+                      className="mb-4 w-90 h-70 rounded object-contain bg-gray-100"
+                      onError={(e) => {
+                        if (e.currentTarget.src !== noImageDisplay) {
+                          e.currentTarget.src = noImageDisplay;
+                        }
+                      }}
                     />
                   )}
+
                   <h2 className="text-lg font-bold">
                     {artwork.title.length > 25
                       ? artwork.title.slice(0, 25) + "..."
@@ -357,9 +361,7 @@ function Met() {
       </main>
 
       <div className="mt-10 w-full">
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          Your Collection
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Your Collection</h2>
         {/* <div className="flex flex-wrap gap-4 mb-4 justify-center">
           {exhibitions.map((exhibition) => (
             <button
@@ -389,20 +391,26 @@ function Met() {
                       <img
                         src={`https://www.artic.edu/iiif/2/${artwork.image_id}/full/843,/0/default.jpg`}
                         alt={artwork.title}
-                        className="mb-4 w-60 h-60 rounded"
+                        className="mb-4 w-60 h-60 rounded object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = noImageDisplay;
+                        }}
                       />
                     ) : artwork.source === "met" && artwork.primaryImage ? (
                       <img
                         src={artwork.primaryImage}
                         alt={artwork.title}
-                        className="mb-4 w-60 h-60 rounded"
+                        className="mb-4 w-60 h-60 rounded object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = noImageDisplay;
+                        }}
                       />
                     ) : (
-                      <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4">
-                        <span className="text-gray-600">
-                          No Image Available
-                        </span>
-                      </div>
+                      <img
+                        src={noImageDisplay}
+                        alt="No image available"
+                        className="mb-4 w-60 h-60 rounded object-contain"
+                      />
                     )}
 
                     <h2 className="text-lg font-bold">

@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchChicagoSingle, fetchMetSingle } from "../api";
+import noImageDisplay from "./assets/NoImageAvailableDisplay.jpg";
 
 const SingleArtwork = () => {
   const params = useParams();
@@ -20,12 +21,21 @@ const SingleArtwork = () => {
         let data;
         if (source === "chicago") {
           data = await fetchChicagoSingle(id!);
-          setArtwork({ ...data.data, source: "aic" });
+          if (!data?.data) {
+            setArtwork(null);
+          } else {
+            setArtwork({ ...data.data, source: "aic" });
+          }
         } else if (source === "met") {
           data = await fetchMetSingle(id);
-          setArtwork({ ...data, source: "met" });
-        } else {
-          console.error("Invalid source type");
+          const hasValidData =
+            data?.objectID &&
+            (data.primaryImage || data.artistDisplayName || data.objectName);
+          if (!hasValidData) {
+            setArtwork(null);
+          } else {
+            setArtwork({ ...data, source: "met" });
+          }
         }
       } catch (error) {
         console.error("Error fetching artwork:", error);
@@ -111,27 +121,31 @@ const SingleArtwork = () => {
 
   if (!artwork)
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center">
         <p className="text-xl font-medium text-red-500">Artwork not found.</p>
       </div>
     );
 
   return (
-    <div className="flex justify-center px-4 py-12 bg-gray-100 min-h-screen">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-3xl w-full">
-        <h1 className="text-4xl font-bold text-center mb-6">{artwork.title}</h1>
+    <div className="flex justify-center px-2 py-4 bg-gray-100 min-h-100">
+      <div className="bg-white shadow-lg rounded-lg p-2 max-w-3xl w-175">
+        <h1 className="text-4xl font-bold text-center mb-5">{artwork.title}</h1>
 
-        {imageUrl && (
-          <div className="flex justify-center mb-6">
-            <img
-              src={imageUrl}
-              alt={artwork.title}
-              className="w-full max-w-lg rounded shadow-md"
-            />
-          </div>
-        )}
+        <div className="flex justify-center mb-6">
+          <img
+            src={imageUrl || noImageDisplay}
+            alt={artwork.title}
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (target.src !== noImageDisplay) {
+                target.src = noImageDisplay;
+              }
+            }}
+            className="w-80 rounded shadow-md object-contain"
+          />
+        </div>
 
-        <div className="space-y-3 text-lg text-gray-700 mb-6">
+        <div className="space-y-2 text-lg text-gray-700 mb-4">
           <p>
             <span className="font-semibold text-gray-900">Artist:</span>{" "}
             {artwork.artist_title || artwork.artistDisplayName || "Unknown"}

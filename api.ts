@@ -18,7 +18,7 @@ export const fetchChicagoArtwork = async () => {
 export const fetchMetEuropeanArtIDs = async () => {
   try {
     const response = await axios.get(
-      "https://collectionapi.metmuseum.org/public/collection/v1/search?q=European&medium=Paintings&hasImages=true"
+      "https://collectionapi.metmuseum.org/public/collection/v1/objects"
     );
 
     return response.data.objectIDs;
